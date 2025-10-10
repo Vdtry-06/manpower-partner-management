@@ -7,5 +7,5 @@ import java.io.Serializable;
 
 @Table(name = "tblPartnerManager")
 @Entity
-public class PartnerManager extends CompanyStaff implements Serializable {
+public class PartnerManager extends Employee implements Serializable {
 }

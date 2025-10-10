@@ -31,6 +31,9 @@ public class Shift implements Serializable {
     @Column(name = "shift_unit_price")
     private Integer shiftUnitPrice;
 
+    @Column(name = "remaining_amount")
+    private Integer remainingAmount;
+
     @Column(name = "description")
     private String description;
 
@@ -38,22 +41,18 @@ public class Shift implements Serializable {
     @JoinColumn(name = "task_contract_id")
     private TaskContract taskContractId;
 
-    @ManyToOne
-    @JoinColumn(name = "task_id")
-    private Task taskId;
-
     public Shift() {}
 
-    public Shift(Integer id, Date workDate, LocalTime startTime, LocalTime endTime, Integer workerCount, Integer shiftUnitPrice, String description, TaskContract taskContractId, Task taskId) {
+    public Shift(Integer id, Date workDate, LocalTime startTime, LocalTime endTime, Integer workerCount, Integer shiftUnitPrice, Integer remainingAmount, String description, TaskContract taskContractId) {
         this.id = id;
         this.workDate = workDate;
         this.startTime = startTime;
         this.endTime = endTime;
         this.workerCount = workerCount;
         this.shiftUnitPrice = shiftUnitPrice;
+        this.remainingAmount = remainingAmount;
         this.description = description;
         this.taskContractId = taskContractId;
-        this.taskId = taskId;
     }
 
     public Integer getId() {
@@ -104,6 +103,14 @@ public class Shift implements Serializable {
         this.shiftUnitPrice = shiftUnitPrice;
     }
 
+    public Integer getRemainingAmount() {
+        return remainingAmount;
+    }
+
+    public void setRemainingAmount(Integer remainingAmount) {
+        this.remainingAmount = remainingAmount;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -118,13 +125,5 @@ public class Shift implements Serializable {
 
     public void setTaskContractId(TaskContract taskContractId) {
         this.taskContractId = taskContractId;
-    }
-
-    public Task getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(Task taskId) {
-        this.taskId = taskId;
     }
 }

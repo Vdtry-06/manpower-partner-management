@@ -1,6 +1,6 @@
 package com.vdtry06.partner_management.source.server.entities;
 
-import com.vdtry06.partner_management.lib.enumerated.InvoiceType;
+import com.vdtry06.partner_management.lib.enumerated.InvoiceStatus;
 import jakarta.persistence.*;
 import lombok.Builder;
 
@@ -22,9 +22,9 @@ public class Invoice implements Serializable {
     @Column(name = "payment_amount")
     private Integer paymentAmount;
 
-    @Column(name = "invoice_type")
+    @Column(name = "invoice_status")
     @Enumerated(EnumType.STRING)
-    private InvoiceType invoiceType;
+    private InvoiceStatus invoiceStatus;
 
     @ManyToOne
     @JoinColumn(name = "shift_id")
@@ -36,11 +36,11 @@ public class Invoice implements Serializable {
 
     public Invoice() {}
 
-    public Invoice(Integer id, Date invoiceDate, Integer paymentAmount, InvoiceType invoiceType, Shift shiftId, Accountant accountantId) {
+    public Invoice(Integer id, Date invoiceDate, Integer paymentAmount, InvoiceStatus invoiceStatus, Shift shiftId, Accountant accountantId) {
         this.id = id;
         this.invoiceDate = invoiceDate;
         this.paymentAmount = paymentAmount;
-        this.invoiceType = invoiceType;
+        this.invoiceStatus = invoiceStatus;
         this.shiftId = shiftId;
         this.accountantId = accountantId;
     }
@@ -69,13 +69,9 @@ public class Invoice implements Serializable {
         this.paymentAmount = paymentAmount;
     }
 
-    public InvoiceType getInvoiceType() {
-        return invoiceType;
-    }
+    public InvoiceStatus getInvoiceStatus() { return invoiceStatus; }
 
-    public void setInvoiceType(InvoiceType invoiceType) {
-        this.invoiceType = invoiceType;
-    }
+    public void setInvoiceStatus(InvoiceStatus invoiceStatus) { this.invoiceStatus = invoiceStatus; }
 
     public Shift getShiftId() {
         return shiftId;

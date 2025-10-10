@@ -4,13 +4,13 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 
-@Table(name = "tblCompanyStaff", schema = "public")
+@Table(name = "tblEmployee", schema = "public")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Entity
-public class CompanyStaff implements Serializable {
+public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "company_staff_id", unique = true, nullable = false)
+    @Column(name = "employee_id", unique = true, nullable = false)
     private Integer id;
 
     @Column(name = "username", unique = true, nullable = false, length = 255)
@@ -28,10 +28,10 @@ public class CompanyStaff implements Serializable {
     @Column(name = "phone_number", length = 10)
     private String phoneNumber;
 
-    public CompanyStaff() {
+    public Employee() {
     }
 
-    public CompanyStaff(Integer id, String username, String password, String fullname, String position, String phoneNumber) {
+    public Employee(Integer id, String username, String password, String fullname, String position, String phoneNumber) {
         this.id = id;
         this.username = username;
         this.password = password;

@@ -28,9 +28,6 @@ public class Contract implements Serializable {
     @Column(name = "total_contract_value", length = 20)
     private Integer totalContractValue;
 
-    @Column(name = "total_amount_paid", length = 20)
-    private Integer totalAmountPaid;
-
     @Column(name = "contract_status")
     @Enumerated(EnumType.STRING)
     private ContractStatus status;
@@ -48,13 +45,12 @@ public class Contract implements Serializable {
 
     public Contract() {}
 
-    public Contract(Integer id, String contractName, Date startDate, Date endDate, Integer totalContractValue, Integer totalAmountPaid, ContractStatus status, String description, PartnerManager partnerManagerId, Partner partnerId) {
+    public Contract(Integer id, String contractName, Date startDate, Date endDate, Integer totalContractValue, ContractStatus status, String description, PartnerManager partnerManagerId, Partner partnerId) {
         this.id = id;
         this.contractName = contractName;
         this.startDate = startDate;
         this.endDate = endDate;
         this.totalContractValue = totalContractValue;
-        this.totalAmountPaid = totalAmountPaid;
         this.status = status;
         this.description = description;
         this.partnerManagerId = partnerManagerId;
@@ -99,14 +95,6 @@ public class Contract implements Serializable {
 
     public void setTotalContractValue(Integer totalContractValue) {
         this.totalContractValue = totalContractValue;
-    }
-
-    public Integer getTotalAmountPaid() {
-        return totalAmountPaid;
-    }
-
-    public void setTotalAmountPaid(Integer totalAmountPaid) {
-        this.totalAmountPaid = totalAmountPaid;
     }
 
     public ContractStatus getStatus() {
