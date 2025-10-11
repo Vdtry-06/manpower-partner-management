@@ -1,5 +1,6 @@
 package com.vdtry06.partner_management.source.server.entities;
 
+import com.vdtry06.partner_management.lib.enumerated.EmployeePostion;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -22,8 +23,9 @@ public class Employee implements Serializable {
     @Column(name = "fullname", length = 255)
     private String fullname;
 
-    @Column(name = "position", length = 255)
-    private String position;
+    @Column(name = "position")
+    @Enumerated(EnumType.STRING)
+    private EmployeePostion position;
 
     @Column(name = "phone_number", length = 10)
     private String phoneNumber;
@@ -31,7 +33,7 @@ public class Employee implements Serializable {
     public Employee() {
     }
 
-    public Employee(Integer id, String username, String password, String fullname, String position, String phoneNumber) {
+    public Employee(Integer id, String username, String password, String fullname, EmployeePostion position, String phoneNumber) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -72,11 +74,11 @@ public class Employee implements Serializable {
         this.fullname = fullname;
     }
 
-    public String getPosition() {
+    public EmployeePostion getPosition() {
         return position;
     }
 
-    public void setPosition(String position) {
+    public void setPosition(EmployeePostion position) {
         this.position = position;
     }
 
