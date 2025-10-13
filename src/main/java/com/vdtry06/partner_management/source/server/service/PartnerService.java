@@ -1,0 +1,127 @@
+package com.vdtry06.partner_management.source.server.service;
+
+import com.vdtry06.partner_management.lib.api.PaginationResponse;
+import com.vdtry06.partner_management.lib.utils.PagingUtil;
+import com.vdtry06.partner_management.source.server.entities.Employee;
+import com.vdtry06.partner_management.source.server.entities.Partner;
+import com.vdtry06.partner_management.source.server.entities.PartnerManager;
+import com.vdtry06.partner_management.source.server.payload.partner.PartnerRequest;
+import com.vdtry06.partner_management.source.server.payload.partner.PartnerResponse;
+import com.vdtry06.partner_management.source.server.repositories.EmployeeRepository;
+import com.vdtry06.partner_management.source.server.repositories.PartnerManagerRepository;
+import com.vdtry06.partner_management.source.server.repositories.PartnerRepository;
+import org.apache.coyote.BadRequestException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+@Service
+public class PartnerService {
+    private final PartnerRepository partnerRepository;
+    private final PartnerManagerService partnerManagerService;
+    private final PartnerManagerRepository partnerManagerRepository;
+    private final EmployeeRepository employeeRepository;
+    private final EmployeeService employeeService;
+
+    public PartnerService(PartnerRepository partnerRepository, PartnerManagerService partnerManagerService, PartnerManagerRepository partnerManagerRepository, EmployeeRepository employeeRepository, EmployeeService employeeService) {
+        this.partnerRepository = partnerRepository;
+        this.partnerManagerService = partnerManagerService;
+        this.partnerManagerRepository = partnerManagerRepository;
+        this.employeeRepository = employeeRepository;
+        this.employeeService = employeeService;
+    }
+
+    @Transactional(rollbackFor = BadRequestException.class)
+    public PartnerResponse createPartner(PartnerRequest partnerRequest) {
+        String currentUsername = employeeService.getCurrentUsername();
+
+        Employee employee = employeeRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
+
+//        if (!employee.getPosition().name().equals("PARTNER_MANAGER")) {
+//            throw new RuntimeException("Chỉ Partner Manager mới có quyền tạo đối tác");
+//        }
+
+
+        PartnerManager partnerManager = (PartnerManager) employee;
+
+        if (partnerRepository.existsByNamePartner(partnerRequest.getNamePartner())) {
+            throw new RuntimeException("Tên đối tác đã có trong hệ thống");
+        }
+
+        Partner partner = toPartner(partnerRequest);
+        partner.setPartnerManagerId(partnerManager);
+        partner = partnerRepository.save(partner);
+
+        return toPartnerResponse(partner);
+    }
+
+//    @Transactional(readOnly = true)
+//    public PaginationResponse<PartnerResponse> getAllPartnersWithConditions(int page, int perPage, String search) {
+//        long totalRecord = partnerRepository.countAllPartnerWithConditions(search);
+//        int offset = PagingUtil.getOffSet(page, perPage);
+//        int totalPage = PagingUtil.getTotalPage(totalRecord, perPage);
+//        List<Partner> partners = partnerRepository.findAllPartnerWithCondition(offset, perPage, search);
+//        List<PartnerResponse> partnerResponses = new ArrayList<>();
+//        if (partners != null) {
+//            partnerResponses = partners
+//                    .stream()
+//                    .map(partner -> toPartnerResponse(partner))
+//                    .toList()
+//            ;
+//        }
+//
+//        return PaginationResponse.<PartnerResponse>builder()
+//                .page(page)
+//                .perPage(perPage)
+//                .data(partnerResponses)
+//                .totalPage(totalPage)
+//                .totalRecord(totalRecord)
+//                .build();
+//
+//    }
+
+    @Transactional(readOnly = true)
+    public PaginationResponse<PartnerResponse> getAllPartnersWithConditions(int page, int perPage, String search) {
+        long totalRecord = partnerRepository.countAllPartnerWithConditions(search);
+        int offset = PagingUtil.getOffSet(page, perPage);
+        int totalPage = PagingUtil.getTotalPage(totalRecord, perPage);
+
+        List<Object[]> rows = partnerRepository.findAllPartnerWithConditions(offset, perPage, search);
+        List<PartnerResponse> partnerResponses = rows.stream()
+                .map(r -> PartnerResponse.builder()
+                        .id((Integer) r[0])
+                        .namePartner((String) r[1])
+                        .build())
+                .toList();
+
+        return new PaginationResponse<>(page, perPage, partnerResponses, totalPage, totalRecord);
+    }
+
+
+    private Partner toPartner(PartnerRequest partnerRequest) {
+        new Partner();
+        return Partner.builder()
+                .namePartner(partnerRequest.getNamePartner())
+                .partnerRepresentative(partnerRequest.getPartnerRepresentative())
+                .phoneNumber(partnerRequest.getPhoneNumber())
+                .email(partnerRequest.getEmail())
+                .address(partnerRequest.getAddress())
+                .taxCode(partnerRequest.getTaxCode())
+                .connperationDate(partnerRequest.getCooperationDate())
+                .description(partnerRequest.getDescription())
+                .build();
+    }
+
+    private PartnerResponse toPartnerResponse(Partner partner) {
+        new PartnerResponse();
+        return PartnerResponse.builder()
+                .id(partner.getId())
+                .namePartner(partner.getNamePartner())
+                .build();
+    }
+}
