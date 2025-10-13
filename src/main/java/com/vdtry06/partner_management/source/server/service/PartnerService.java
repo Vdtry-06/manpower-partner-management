@@ -19,26 +19,37 @@ public class PartnerService {
     private final PartnerManagerService partnerManagerService;
     private final PartnerManagerRepository partnerManagerRepository;
     private final EmployeeRepository employeeRepository;
+    private final EmployeeService employeeService;
 
-    public PartnerService(PartnerRepository partnerRepository, PartnerManagerService partnerManagerService, PartnerManagerRepository partnerManagerRepository, EmployeeRepository employeeRepository) {
+    public PartnerService(PartnerRepository partnerRepository, PartnerManagerService partnerManagerService, PartnerManagerRepository partnerManagerRepository, EmployeeRepository employeeRepository, EmployeeService employeeService) {
         this.partnerRepository = partnerRepository;
         this.partnerManagerService = partnerManagerService;
         this.partnerManagerRepository = partnerManagerRepository;
         this.employeeRepository = employeeRepository;
+        this.employeeService = employeeService;
     }
 
     @Transactional(rollbackFor = BadRequestException.class)
-    public PartnerResponse createPartner(Integer id, PartnerRequest partnerRequest) {
+    public PartnerResponse createPartner(PartnerRequest partnerRequest) {
+        String currentUsername = employeeService.getCurrentUsername();
+
+        Employee employee = employeeRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
+
+        if (!employee.getPosition().name().equals("PARTNER_MANAGER")) {
+            throw new RuntimeException("Chỉ Partner Manager mới có quyền tạo đối tác");
+        }
+
+        PartnerManager partnerManager = (PartnerManager) employee;
+
         if (partnerRepository.existsByNamePartner(partnerRequest.getNamePartner())) {
             throw new RuntimeException("Tên đối tác đã có trong hệ thống");
         }
 
-        PartnerManager partnerManager = partnerManagerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("id này không có quyền vào"));
-
         Partner partner = toPartner(partnerRequest);
         partner.setPartnerManagerId(partnerManager);
         partner = partnerRepository.save(partner);
+
         return toPartnerResponse(partner);
     }
 
