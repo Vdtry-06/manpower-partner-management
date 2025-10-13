@@ -9,4 +9,5 @@ import lombok.*;
 @NoArgsConstructor
 public class PartnerResponse {
     private Integer id;
+    private String namePartner;
 }
