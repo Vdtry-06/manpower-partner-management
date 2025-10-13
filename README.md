@@ -1,0 +1,4 @@
+- Model:
+  - PartnerManager management Partner
+  - PartnerManager sign contract with Partner
+  - Accountant received payment by Partner
