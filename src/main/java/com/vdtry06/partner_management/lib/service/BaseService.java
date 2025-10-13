@@ -20,7 +20,7 @@ public class BaseService<T, ID> {
         return repository.save(entity);
     }
 
-    public T findByField(Map<String, Object> fields) {
+    public T findByFields(Map<String, Object> fields) {
         return repository.findOne(
                 (root, query, criteriaBuilder)
                         -> criteriaBuilder.and(buildPredicates(fields, criteriaBuilder, root)
