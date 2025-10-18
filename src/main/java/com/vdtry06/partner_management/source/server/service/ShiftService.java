@@ -17,7 +17,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +30,12 @@ public class ShiftService extends BaseService<Shift, Integer> {
         super(repository);
         this.shiftRepository = shiftRepository;
         this.taskContractRepository = taskContractRepository;
+    }
+
+    protected void updateRemainingAmount(Integer shiftId, Integer paymentAmount) {
+        Shift shift = shiftRepository.findById(shiftId).orElse(null);
+        shift.setRemainingAmount(shift.getRemainingAmount() - paymentAmount);
+        shiftRepository.save(shift);
     }
 
     @Transactional(rollbackFor = BadRequestException.class)
@@ -142,7 +147,7 @@ public class ShiftService extends BaseService<Shift, Integer> {
                 .build();
     }
 
-    private ShiftResponse toShiftResponse(Shift shift) {
+    protected ShiftResponse toShiftResponse(Shift shift) {
         new ShiftResponse();
         return ShiftResponse.builder()
                 .id(shift.getId())
