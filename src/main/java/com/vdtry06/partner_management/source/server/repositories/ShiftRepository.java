@@ -18,6 +18,15 @@ public interface ShiftRepository extends BaseRepository<Shift, Integer> {
 
     boolean existsBystartTime(LocalTime startTime);
 
+    @Query(
+            value = "SELECT * " +
+                    "FROM public.tbl_shift s " +
+                    "WHERE s.task_contract_id = :taskContractId ",
+            nativeQuery = true
+    )
+    List<Shift> findShiftListByTaskContractId(
+            @Param("taskContractId") Integer taskContractId
+    );
 
     boolean existsByTaskContractId(TaskContract taskContractId);
 
@@ -36,10 +45,13 @@ public interface ShiftRepository extends BaseRepository<Shift, Integer> {
     @Query(
             value = "SELECT * " +
                     "FROM public.tbl_shift s " +
-                    "WHERE s.task_contract_id = :taskContractId",
+                    "WHERE s.task_contract_id = :taskContractId " +
+                    "LIMIT :limit OFFSET :offset ",
             nativeQuery = true
     )
     List<Shift> findAllShiftByTaskContractId(
+            @Param("offset") int offset,
+            @Param("limit") int limit,
             @Param("taskContractId") Integer taskContractId
     );
 
