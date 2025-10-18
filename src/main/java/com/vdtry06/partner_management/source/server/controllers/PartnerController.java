@@ -25,6 +25,11 @@ public class PartnerController {
         return new ApiResponse<PartnerResponse>(true, partnerService.createPartner(partnerRequest));
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse<PartnerResponse> getPartnerById(@PathVariable int id) {
+        return new ApiResponse<PartnerResponse>(true, partnerService.getPartnerById(id));
+    }
+
     @GetMapping
     public PaginationResponse<PartnerResponse> getAllPartnersWithConditions(
             @RequestParam(required = false, defaultValue = PagingUtil.DEFAULT_PAGE) int page,

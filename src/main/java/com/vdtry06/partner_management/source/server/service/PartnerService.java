@@ -2,7 +2,6 @@ package com.vdtry06.partner_management.source.server.service;
 
 import com.vdtry06.partner_management.lib.api.PaginationResponse;
 import com.vdtry06.partner_management.lib.utils.PagingUtil;
-import com.vdtry06.partner_management.source.server.entities.Employee;
 import com.vdtry06.partner_management.source.server.entities.Partner;
 import com.vdtry06.partner_management.source.server.entities.PartnerManager;
 import com.vdtry06.partner_management.source.server.payload.partner.PartnerRequest;
@@ -11,11 +10,9 @@ import com.vdtry06.partner_management.source.server.repositories.EmployeeReposit
 import com.vdtry06.partner_management.source.server.repositories.PartnerManagerRepository;
 import com.vdtry06.partner_management.source.server.repositories.PartnerRepository;
 import org.apache.coyote.BadRequestException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -37,17 +34,7 @@ public class PartnerService {
 
     @Transactional(rollbackFor = BadRequestException.class)
     public PartnerResponse createPartner(PartnerRequest partnerRequest) {
-        String currentUsername = employeeService.getCurrentUsername();
-
-        Employee employee = employeeRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
-
-//        if (!employee.getPosition().name().equals("PARTNER_MANAGER")) {
-//            throw new RuntimeException("Chỉ Partner Manager mới có quyền tạo đối tác");
-//        }
-
-
-        PartnerManager partnerManager = (PartnerManager) employee;
+        PartnerManager partnerManager = partnerManagerService.getCurrentPartnerManager();
 
         if (partnerRepository.existsByNamePartner(partnerRequest.getNamePartner())) {
             throw new RuntimeException("Tên đối tác đã có trong hệ thống");
@@ -57,6 +44,13 @@ public class PartnerService {
         partner.setPartnerManagerId(partnerManager);
         partner = partnerRepository.save(partner);
 
+        return toPartnerResponse(partner);
+    }
+
+    @Transactional(readOnly = true)
+    public PartnerResponse getPartnerById(Integer partnerId) {
+        Partner partner =  partnerRepository.findById(partnerId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đối tác có id: " + partnerId));
         return toPartnerResponse(partner);
     }
 
@@ -96,12 +90,14 @@ public class PartnerService {
                 .map(r -> PartnerResponse.builder()
                         .id((Integer) r[0])
                         .namePartner((String) r[1])
+                        .partnerRepresentative((String) r[2])
+                        .phoneNumber((String) r[3])
+                        .email((String) r[4])
                         .build())
                 .toList();
 
         return new PaginationResponse<>(page, perPage, partnerResponses, totalPage, totalRecord);
     }
-
 
     private Partner toPartner(PartnerRequest partnerRequest) {
         new Partner();
@@ -122,6 +118,9 @@ public class PartnerService {
         return PartnerResponse.builder()
                 .id(partner.getId())
                 .namePartner(partner.getNamePartner())
+                .partnerRepresentative(partner.getPartnerRepresentative())
+                .phoneNumber(partner.getPhoneNumber())
+                .email(partner.getEmail())
                 .build();
     }
 }
