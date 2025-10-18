@@ -1,6 +1,7 @@
 package com.vdtry06.partner_management.source.server.entities;
 
 import com.vdtry06.partner_management.lib.enumerated.InvoiceStatus;
+import com.vdtry06.partner_management.lib.enumerated.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.Builder;
 
@@ -22,6 +23,10 @@ public class Invoice implements Serializable {
     @Column(name = "payment_amount")
     private Integer paymentAmount;
 
+    @Column(name = "payment_method")
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
     @Column(name = "invoice_status")
     @Enumerated(EnumType.STRING)
     private InvoiceStatus invoiceStatus;
@@ -36,10 +41,11 @@ public class Invoice implements Serializable {
 
     public Invoice() {}
 
-    public Invoice(Integer id, LocalDateTime invoiceDate, Integer paymentAmount, InvoiceStatus invoiceStatus, Shift shiftId, Accountant accountantId) {
+    public Invoice(Integer id, LocalDateTime invoiceDate, Integer paymentAmount, PaymentMethod paymentMethod, InvoiceStatus invoiceStatus, Shift shiftId, Accountant accountantId) {
         this.id = id;
         this.invoiceDate = invoiceDate;
         this.paymentAmount = paymentAmount;
+        this.paymentMethod = paymentMethod;
         this.invoiceStatus = invoiceStatus;
         this.shiftId = shiftId;
         this.accountantId = accountantId;
@@ -63,6 +69,14 @@ public class Invoice implements Serializable {
 
     public Integer getPaymentAmount() {
         return paymentAmount;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     public void setPaymentAmount(Integer paymentAmount) {
