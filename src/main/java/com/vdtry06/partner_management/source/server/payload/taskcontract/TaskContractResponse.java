@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 public class TaskContractResponse {
     private Integer id;
+    private Integer contractId;
+    private Integer taskId;
     private Integer taskUnitPrice;
-    private Contract contractId;
-    private Task taskId;
 }
