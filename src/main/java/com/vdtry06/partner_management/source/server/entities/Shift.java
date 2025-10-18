@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
 
 @Table(name = "tblShift", schema = "public")
 @Builder
@@ -17,7 +17,7 @@ public class Shift implements Serializable {
     private Integer id;
 
     @Column(name = "work_date")
-    private Date workDate;
+    private LocalDate workDate;
 
     @Column(name = "start_time")
     private LocalTime startTime;
@@ -34,7 +34,7 @@ public class Shift implements Serializable {
     @Column(name = "remaining_amount")
     private Integer remainingAmount;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 255, nullable = true)
     private String description;
 
     @ManyToOne
@@ -43,7 +43,7 @@ public class Shift implements Serializable {
 
     public Shift() {}
 
-    public Shift(Integer id, Date workDate, LocalTime startTime, LocalTime endTime, Integer workerCount, Integer shiftUnitPrice, Integer remainingAmount, String description, TaskContract taskContractId) {
+    public Shift(Integer id, LocalDate workDate, LocalTime startTime, LocalTime endTime, Integer workerCount, Integer shiftUnitPrice, Integer remainingAmount, String description, TaskContract taskContractId) {
         this.id = id;
         this.workDate = workDate;
         this.startTime = startTime;
@@ -63,11 +63,11 @@ public class Shift implements Serializable {
         this.id = id;
     }
 
-    public Date getWorkDate() {
+    public LocalDate getWorkDate() {
         return workDate;
     }
 
-    public void setWorkDate(Date workDate) {
+    public void setWorkDate(LocalDate workDate) {
         this.workDate = workDate;
     }
 

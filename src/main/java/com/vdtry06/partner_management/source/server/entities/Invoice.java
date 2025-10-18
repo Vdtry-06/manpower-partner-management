@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Table(name = "tblInvoice", schema = "public")
 @Builder
@@ -17,7 +17,7 @@ public class Invoice implements Serializable {
     private Integer id;
 
     @Column(name = "invoice_date")
-    private Date invoiceDate;
+    private LocalDateTime invoiceDate;
 
     @Column(name = "payment_amount")
     private Integer paymentAmount;
@@ -36,7 +36,7 @@ public class Invoice implements Serializable {
 
     public Invoice() {}
 
-    public Invoice(Integer id, Date invoiceDate, Integer paymentAmount, InvoiceStatus invoiceStatus, Shift shiftId, Accountant accountantId) {
+    public Invoice(Integer id, LocalDateTime invoiceDate, Integer paymentAmount, InvoiceStatus invoiceStatus, Shift shiftId, Accountant accountantId) {
         this.id = id;
         this.invoiceDate = invoiceDate;
         this.paymentAmount = paymentAmount;
@@ -53,11 +53,11 @@ public class Invoice implements Serializable {
         this.id = id;
     }
 
-    public Date getInvoiceDate() {
+    public LocalDateTime getInvoiceDate() {
         return invoiceDate;
     }
 
-    public void setInvoiceDate(Date invoiceDate) {
+    public void setInvoiceDate(LocalDateTime invoiceDate) {
         this.invoiceDate = invoiceDate;
     }
 

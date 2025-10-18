@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Table(name = "tblPartner", schema = "public")
 @Builder
@@ -34,9 +34,9 @@ public class Partner implements Serializable {
     private String taxCode;
 
     @Column(name = "connperation_date")
-    private Date connperationDate;
+    private LocalDate connperationDate;
 
-    @Column(name = "description", length = 255)
+    @Column(name = "description", length = 255, nullable = true)
     private String description;
 
     @ManyToOne
@@ -46,7 +46,7 @@ public class Partner implements Serializable {
 
     public Partner() {}
 
-    public Partner(Integer id, String namePartner, String partnerRepresentative, String phoneNumber, String email, String address, String taxCode, Date connperationDate, String description, PartnerManager partnerManagerId) {
+    public Partner(Integer id, String namePartner, String partnerRepresentative, String phoneNumber, String email, String address, String taxCode, LocalDate connperationDate, String description, PartnerManager partnerManagerId) {
         this.id = id;
         this.namePartner = namePartner;
         this.partnerRepresentative = partnerRepresentative;
@@ -115,11 +115,11 @@ public class Partner implements Serializable {
         this.taxCode = taxCode;
     }
 
-    public Date getConnperationDate() {
+    public LocalDate getconnperationDate() {
         return connperationDate;
     }
 
-    public void setConnperationDate(Date connperationDate) {
+    public void setconnperationDate(LocalDate connperationDate) {
         this.connperationDate = connperationDate;
     }
 

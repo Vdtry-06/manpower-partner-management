@@ -1,9 +1,8 @@
 package com.vdtry06.partner_management.source.server.payload.partner;
 
-import com.vdtry06.partner_management.source.server.entities.PartnerManager;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -17,6 +16,6 @@ public class PartnerRequest {
     private String email;
     private String address;
     private String taxCode;
-    private Date cooperationDate;
+    private LocalDate cooperationDate;
     private String description;
 }

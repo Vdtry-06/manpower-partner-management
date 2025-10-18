@@ -17,7 +17,7 @@ public class Task implements Serializable {
     @Column(name = "name_task", unique = false, length = 255)
     private String nameTask;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 255, nullable = true)
     private String description;
 
     public Task() {}
