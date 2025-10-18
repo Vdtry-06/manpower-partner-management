@@ -9,4 +9,5 @@ import java.util.List;
 public interface TaskContractRepository extends BaseRepository<TaskContract, Integer> {
 
     List<TaskContract> findByContractId(Contract contract);
+
 }
