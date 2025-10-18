@@ -10,10 +10,12 @@ import java.util.List;
 
 @Repository
 public interface PartnerRepository extends BaseRepository<Partner, Integer> {
+
     boolean existsByNamePartner(String namePartner);
 
     @Query(
-            value = "SELECT COUNT(*) FROM public.tbl_partner p " +
+            value = "SELECT COUNT(*) " +
+                    "FROM public.tbl_partner p " +
                     "WHERE ( :search IS NULL OR :search = '' OR p.name_partner ILIKE CONCAT('%', :search, '%')) ",
             nativeQuery = true)
     long countAllPartnerWithConditions(@Param("search") String search);
@@ -36,7 +38,7 @@ public interface PartnerRepository extends BaseRepository<Partner, Integer> {
         - toi uu hon khi nhieu bang lon
      */
     @Query(
-            value = "SELECT p.partner_id AS id, p.name_partner AS namePartner " +
+            value = "SELECT p.partner_id AS id, p.name_partner AS namePartner, p.partner_representative AS partnerRepresentative, p.phone_number AS phoneNumber, p.email AS email, p.name_partner AS namePartner " +
                     "FROM public.tbl_partner p " +
                     "WHERE ( :search IS NULL OR :search = '' OR p.name_partner ILIKE CONCAT('%', :search, '%')) " +
                     "ORDER BY p.partner_id ASC " +
