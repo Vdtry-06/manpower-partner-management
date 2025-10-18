@@ -11,9 +11,7 @@ import com.vdtry06.partner_management.source.server.entities.PartnerManager;
 import com.vdtry06.partner_management.source.server.payload.contract.ContractResponse;
 import com.vdtry06.partner_management.source.server.repositories.ContractRepository;
 import com.vdtry06.partner_management.source.server.repositories.PartnerRepository;
-import com.vdtry06.partner_management.source.server.repositories.spec.ContractSpecification;
 import org.apache.coyote.BadRequestException;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -137,8 +135,8 @@ public class ContractService extends BaseService<Contract, Integer> {
                 .totalContractValue(contract.getTotalContractValue())
                 .status(contract.getStatus())
                 .description(contract.getDescription())
-                .partnerManagerId(contract.getPartnerManagerId())
-                .partnerId(contract.getPartnerId())
+                .partnerManagerId(contract.getPartnerManagerId().getId())
+                .partnerId(contract.getPartnerId().getId())
                 .build();
     }
 }
