@@ -1,5 +1,7 @@
-package com.vdtry06.partner_management.source.server.config;
+package com.vdtry06.partner_management.source.server.config.security;
 
+import com.vdtry06.partner_management.source.server.config.language.DetectLanguageInterceptor;
+import com.vdtry06.partner_management.source.server.config.language.MessageSourceHelper;
 import com.vdtry06.partner_management.source.server.repositories.BlacklistedTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.vdtry06.partner_management.source.server.service.TokenBlacklistService;
 
@@ -29,6 +32,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final UserDetailsService userDetailsService;
     private final TokenBlacklistService tokenBlacklistService;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
+    private final DetectLanguageInterceptor languageInterceptor;
+    private final MessageSourceHelper messageSourceHelper;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -46,9 +51,14 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         return http.build();
     }
 
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(languageInterceptor);
+    }
+
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtProvider, userDetailsService, tokenBlacklistService, blacklistedTokenRepository);
+        return new JwtAuthenticationFilter(jwtProvider, userDetailsService, tokenBlacklistService, blacklistedTokenRepository, messageSourceHelper);
     }
 
     @Bean

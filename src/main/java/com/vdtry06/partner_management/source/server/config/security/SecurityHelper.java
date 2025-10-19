@@ -1,4 +1,4 @@
-package com.vdtry06.partner_management.source.server.config;
+package com.vdtry06.partner_management.source.server.config.security;
 
 import com.vdtry06.partner_management.source.server.entities.Employee;
 import com.vdtry06.partner_management.source.server.service.EmployeeService;

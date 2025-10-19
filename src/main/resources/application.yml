@@ -15,6 +15,9 @@ spring:
     properties:
       hibernate:dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  messages:
+    encoding: UTF-8
+
 jwt:
   secret-key: "${JWT_SIGNER_KEY:s^u0DN^i@lnxshKC2fDRZBv9CcwYv9Q#BNutL5jdtKo=}"
   access-token:

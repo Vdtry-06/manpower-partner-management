@@ -1,6 +1,10 @@
 package com.vdtry06.partner_management.source.server.service;
 
-import com.vdtry06.partner_management.source.server.config.JwtProvider;
+import com.vdtry06.partner_management.lib.enumerated.Language;
+import com.vdtry06.partner_management.lib.exceptions.BadRequestException;
+import com.vdtry06.partner_management.source.server.config.language.LanguageContext;
+import com.vdtry06.partner_management.source.server.config.language.MessageSourceHelper;
+import com.vdtry06.partner_management.source.server.config.security.JwtProvider;
 import com.vdtry06.partner_management.source.server.entities.BlacklistedToken;
 import com.vdtry06.partner_management.source.server.entities.Employee;
 import com.vdtry06.partner_management.source.server.payload.auth.LoginRequest;
@@ -10,14 +14,15 @@ import com.vdtry06.partner_management.source.server.payload.auth.TokenResponse;
 import com.vdtry06.partner_management.source.server.repositories.BlacklistedTokenRepository;
 import com.vdtry06.partner_management.source.server.repositories.EmployeeRepository;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import com.nimbusds.jose.*;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -27,23 +32,26 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
+    private final MessageSourceHelper messageSourceHelper;
 
-    public AuthService(EmployeeRepository employeeRepository, AuthenticationManager authenticationManager, JwtProvider jwtProvider, BlacklistedTokenRepository blacklistedTokenRepository) {
+    public AuthService(EmployeeRepository employeeRepository, AuthenticationManager authenticationManager, JwtProvider jwtProvider, BlacklistedTokenRepository blacklistedTokenRepository, MessageSourceHelper messageSourceHelper) {
         this.employeeRepository = employeeRepository;
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
         this.blacklistedTokenRepository = blacklistedTokenRepository;
+        this.messageSourceHelper = messageSourceHelper;
     }
 
 
     public LoginResponse login(LoginRequest loginRequest) {
+        log.info("Current Locale: {}", LanguageContext.getLocale());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         Employee employee = employeeRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new RuntimeException("Tên đăng nhập không tìm thấy"));
+                .orElseThrow(() -> new BadRequestException(messageSourceHelper.getMessage("error.user_not_found")));
 
         final String accessToken = jwtProvider.generateToken(employee.getUsername());
         final String refreshToken = UUID.randomUUID().toString();
@@ -97,7 +105,20 @@ public class AuthService {
 
         } catch (Exception e) {
             log.error("Error during logout: {}", e.getMessage());
-            throw new RuntimeException("Logout failed", e);
+            throw new BadRequestException(messageSourceHelper.getMessage("error.logout_failed"));
+        }
+    }
+
+    @Deprecated
+    private Language getLegion() {
+        final Locale locale = LocaleContextHolder.getLocale();
+        switch (locale.getLanguage()) {
+            case "en":
+                return Language.EN;
+            case "vi":
+                return Language.VI;
+            default:
+                return Language.DEFAULT;
         }
     }
 }

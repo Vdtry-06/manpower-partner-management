@@ -1,5 +1,6 @@
-package com.vdtry06.partner_management.source.server.config;
+package com.vdtry06.partner_management.source.server.config.security;
 
+import com.vdtry06.partner_management.source.server.config.language.MessageSourceHelper;
 import com.vdtry06.partner_management.source.server.repositories.BlacklistedTokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final TokenBlacklistService tokenBlacklistService;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
+    private final MessageSourceHelper messageSourceHelper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -52,6 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.warn("Token đã bị blacklist: {}", jwtId);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json;charset=UTF-8");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, messageSourceHelper.getMessage("warning.access_denied"));
                 response.getWriter().write("{\"error\":\"Token đã bị vô hiệu hóa\"}");
                 return;
             }
@@ -74,6 +77,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
             log.error("Cannot set user authentication: {}", e.getMessage());
+
             filterChain.doFilter(request, response);
         }
     }

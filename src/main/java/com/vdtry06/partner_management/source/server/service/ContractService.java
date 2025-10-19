@@ -1,16 +1,17 @@
 package com.vdtry06.partner_management.source.server.service;
 
+import com.vdtry06.partner_management.lib.exceptions.BadRequestException;
 import com.vdtry06.partner_management.lib.api.PaginationResponse;
 import com.vdtry06.partner_management.lib.enumerated.ContractStatus;
 import com.vdtry06.partner_management.lib.repository.BaseRepository;
 import com.vdtry06.partner_management.lib.service.BaseService;
 import com.vdtry06.partner_management.lib.utils.PagingUtil;
+import com.vdtry06.partner_management.source.server.config.language.MessageSourceHelper;
 import com.vdtry06.partner_management.source.server.entities.Contract;
 import com.vdtry06.partner_management.source.server.entities.Partner;
 import com.vdtry06.partner_management.source.server.entities.PartnerManager;
 import com.vdtry06.partner_management.source.server.payload.contract.ContractResponse;
 import com.vdtry06.partner_management.source.server.repositories.ContractRepository;
-import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,17 +25,19 @@ public class ContractService extends BaseService<Contract, Integer> {
     private final PartnerManagerService partnerManagerService;
     private final TaskContractService taskContractService;
     private final PartnerService partnerService;
+    private final MessageSourceHelper messageSourceHelper;
 
-    protected ContractService(BaseRepository<Contract, Integer> repository, ContractRepository contractRepository, PartnerManagerService partnerManagerService, PartnerService partnerService, TaskContractService taskContractService) {
+    protected ContractService(BaseRepository<Contract, Integer> repository, ContractRepository contractRepository, PartnerManagerService partnerManagerService, PartnerService partnerService, TaskContractService taskContractService, MessageSourceHelper messageSourceHelper) {
         super(repository);
         this.contractRepository = contractRepository;
         this.partnerManagerService = partnerManagerService;
         this.partnerService = partnerService;
         this.taskContractService = taskContractService;
+        this.messageSourceHelper = messageSourceHelper;
     }
 
     public ContractResponse getContractByPartnerIdAndContractId(Integer partnerId, Integer contractId) {
-        if (!partnerService.existsById(partnerId)) throw new RuntimeException("Không tìm thấy id đối tác");
+        if (!partnerService.existsById(partnerId)) throw new BadRequestException(messageSourceHelper.getMessage("error.not_found.partner"));
         Contract contract = contractRepository.findContractByPartnerIdAndContactId(partnerId, contractId);
 
         return toContractResponse(contract);
@@ -42,7 +45,7 @@ public class ContractService extends BaseService<Contract, Integer> {
 
     @Transactional(readOnly = true)
     public PaginationResponse<ContractResponse> getAllContractsByPartnerId(int page, int perPage, Integer partnerId) {
-        if (!partnerService.existsById(partnerId)) throw new RuntimeException("Không tìm thấy id đối tác");
+        if (!partnerService.existsById(partnerId)) throw new BadRequestException(messageSourceHelper.getMessage("error.not_found.partner"));
         long totalRecord = contractRepository.countAllContractByPartnerId(partnerId);
         int offset = PagingUtil.getOffSet(page, perPage);
         int totalPage = PagingUtil.getTotalPage(totalRecord, perPage);
@@ -68,7 +71,7 @@ public class ContractService extends BaseService<Contract, Integer> {
     @Transactional(readOnly = true)
     public ContractResponse getContractById(Integer contractId) {
         Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy id của hợp đồng"));
+                .orElseThrow(() -> new BadRequestException(messageSourceHelper.getMessage("error.not_found.contract")));
         return toContractResponse(contract);
     }
 
@@ -93,7 +96,7 @@ public class ContractService extends BaseService<Contract, Integer> {
     @Transactional(rollbackFor = BadRequestException.class)
     public ContractResponse updateContract(Integer contractId) {
         Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy id hợp đồng"));
+                .orElseThrow(() -> new BadRequestException(messageSourceHelper.getMessage("error.not_found.contract")));
 
 //        if (contract.getEndDate() != null || contract.getDescription() != null) {
 //            throw new RuntimeException("Id của hợp đồng không phù hợp");

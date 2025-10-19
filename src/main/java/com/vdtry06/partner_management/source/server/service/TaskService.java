@@ -1,9 +1,11 @@
 package com.vdtry06.partner_management.source.server.service;
 
 import com.vdtry06.partner_management.lib.api.PaginationResponse;
+import com.vdtry06.partner_management.lib.exceptions.BadRequestException;
 import com.vdtry06.partner_management.lib.repository.BaseRepository;
 import com.vdtry06.partner_management.lib.service.BaseService;
 import com.vdtry06.partner_management.lib.utils.PagingUtil;
+import com.vdtry06.partner_management.source.server.config.language.MessageSourceHelper;
 import com.vdtry06.partner_management.source.server.entities.Task;
 import com.vdtry06.partner_management.source.server.payload.task.TaskRequest;
 import com.vdtry06.partner_management.source.server.payload.task.TaskResponse;
@@ -17,17 +19,18 @@ import java.util.List;
 @Service
 public class TaskService extends BaseService<Task, Integer> {
     private final TaskRepository taskRepository;
+    private final MessageSourceHelper messageSourceHelper;
 
-    public TaskService(BaseRepository<Task, Integer> repository, TaskRepository taskRepository) {
+    protected TaskService(BaseRepository<Task, Integer> repository, TaskRepository taskRepository, MessageSourceHelper messageSourceHelper) {
         super(repository);
         this.taskRepository = taskRepository;
+        this.messageSourceHelper = messageSourceHelper;
     }
 
     protected Task findById(Integer taskId) {
         return taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy id của đầu việc"));
+                .orElseThrow(() -> new BadRequestException(messageSourceHelper.getMessage("error.not_found.task")));
     }
-
 
     public TaskResponse getTaskById(Integer taskId) {
         Task task = taskRepository.findById(taskId).orElse(null);
@@ -41,7 +44,7 @@ public class TaskService extends BaseService<Task, Integer> {
 
     public TaskResponse createTask(TaskRequest taskRequest) {
         if (taskRepository.existsByNameTask(taskRequest.getNameTask())) {
-            throw new RuntimeException("Tên đầu việc đã có trong hệ thống");
+            throw new BadRequestException(messageSourceHelper.getMessage("error.task.name_exists"));
         }
 
         Task task = toTask(taskRequest);

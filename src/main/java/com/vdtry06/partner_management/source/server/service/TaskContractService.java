@@ -1,9 +1,11 @@
 package com.vdtry06.partner_management.source.server.service;
 
 import com.vdtry06.partner_management.lib.api.PaginationResponse;
+import com.vdtry06.partner_management.lib.exceptions.BadRequestException;
 import com.vdtry06.partner_management.lib.repository.BaseRepository;
 import com.vdtry06.partner_management.lib.service.BaseService;
 import com.vdtry06.partner_management.lib.utils.PagingUtil;
+import com.vdtry06.partner_management.source.server.config.language.MessageSourceHelper;
 import com.vdtry06.partner_management.source.server.entities.Contract;
 import com.vdtry06.partner_management.source.server.entities.Shift;
 import com.vdtry06.partner_management.source.server.entities.Task;
@@ -28,18 +30,20 @@ public class TaskContractService extends BaseService<TaskContract, Integer> {
     private final ShiftService shiftService;
     private final TaskService taskService;
     private final ContractHelperService contractHelperService;
+    private final MessageSourceHelper messageSourceHelper;
 
-    protected TaskContractService(BaseRepository<TaskContract, Integer> repository, TaskContractRepository taskContractRepository, ShiftService shiftService, TaskService taskService, ContractHelperService contractHelperService) {
+    protected TaskContractService(BaseRepository<TaskContract, Integer> repository, TaskContractRepository taskContractRepository, ShiftService shiftService, TaskService taskService, ContractHelperService contractHelperService, MessageSourceHelper messageSourceHelper) {
         super(repository);
         this.taskContractRepository = taskContractRepository;
         this.shiftService = shiftService;
         this.taskService = taskService;
         this.contractHelperService = contractHelperService;
+        this.messageSourceHelper = messageSourceHelper;
     }
 
     private Integer totalUnitPriceByTaskContractId(Integer taskContractId) {
         if (!shiftService.existsByTaskContractId(taskContractId)) {
-            throw new RuntimeException("Không tìm thấy id của đầu việc trong hợp đồng");
+            throw new BadRequestException(messageSourceHelper.getMessage("error.not_found.task_contract"));
         }
         Specification<Shift> spec = ShiftSpecification.hasTaskContractId(taskContractId);
 
@@ -54,7 +58,7 @@ public class TaskContractService extends BaseService<TaskContract, Integer> {
 
     private LocalDate endDateShiftOfTaskContractId(Integer taskContractId) {
         if (!shiftService.existsByTaskContractId(taskContractId)) {
-            throw new RuntimeException("Không tìm thấy id của đầu việc trong hợp đồng");
+            throw new BadRequestException(messageSourceHelper.getMessage("error.not_found.task_contract"));
         }
         Specification<Shift> spec = ShiftSpecification.hasTaskContractId(taskContractId);
 
@@ -69,7 +73,7 @@ public class TaskContractService extends BaseService<TaskContract, Integer> {
     }
 
     public PaginationResponse<ShiftTaskListContractResponse> getShiftTaskListOfContract(int page, int perPage, Integer contractId) {
-        if (!contractHelperService.existsById(contractId)) throw new RuntimeException("Không tìm thấy id của hợp đồng");
+        if (!contractHelperService.existsById(contractId)) throw new BadRequestException(messageSourceHelper.getMessage("error.not_found.contract"));
         List<TaskContract> taskContracts = taskContractRepository.findByContractId(contractHelperService.findById(contractId));
 
         List<ShiftTaskListContractResponse> shiftTaskListContractResponses = new ArrayList<>();
@@ -110,12 +114,12 @@ public class TaskContractService extends BaseService<TaskContract, Integer> {
     protected String getListNameTasks(Integer contractId) {
         Contract contract = contractHelperService.findById(contractId);
         List<TaskContract> taskContracts = taskContractRepository.findByContractId(contract);
-        String description = "";
+        StringBuilder description = new StringBuilder();
         for (TaskContract taskContract : taskContracts) {
-            description += taskService.getNameTask(taskContract.getTaskId().getId()) + ", ";
+            description.append(taskService.getNameTask(taskContract.getTaskId().getId())).append(", ");
         }
-        description = description.substring(0, description.length() - 2);
-        return description;
+        description = new StringBuilder(description.substring(0, description.length() - 2));
+        return description.toString();
     }
 
     protected Integer totalTasksUnitPrice(Integer contractId) {

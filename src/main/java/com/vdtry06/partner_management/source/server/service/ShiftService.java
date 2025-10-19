@@ -1,9 +1,11 @@
 package com.vdtry06.partner_management.source.server.service;
 
 import com.vdtry06.partner_management.lib.api.PaginationResponse;
+import com.vdtry06.partner_management.lib.exceptions.BadRequestException;
 import com.vdtry06.partner_management.lib.repository.BaseRepository;
 import com.vdtry06.partner_management.lib.service.BaseService;
 import com.vdtry06.partner_management.lib.utils.PagingUtil;
+import com.vdtry06.partner_management.source.server.config.language.MessageSourceHelper;
 import com.vdtry06.partner_management.source.server.entities.Shift;
 import com.vdtry06.partner_management.source.server.entities.TaskContract;
 import com.vdtry06.partner_management.source.server.payload.shift.ShiftRequest;
@@ -12,7 +14,6 @@ import com.vdtry06.partner_management.source.server.payload.shift.ShiftTimeRespo
 import com.vdtry06.partner_management.source.server.repositories.ShiftRepository;
 import com.vdtry06.partner_management.source.server.repositories.spec.ShiftSpecification;
 import com.vdtry06.partner_management.source.server.service.helpers.TaskContractHelperService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +28,13 @@ import java.util.Objects;
 public class ShiftService extends BaseService<Shift, Integer> {
     private final ShiftRepository shiftRepository;
     private final TaskContractHelperService taskContractHelperService;
+    private final MessageSourceHelper messageSourceHelper;
 
-    protected ShiftService(BaseRepository<Shift, Integer> repository, ShiftRepository shiftRepository, TaskContractHelperService taskContractHelperService) {
+    protected ShiftService(BaseRepository<Shift, Integer> repository, ShiftRepository shiftRepository, TaskContractHelperService taskContractHelperService, MessageSourceHelper messageSourceHelper) {
         super(repository);
         this.shiftRepository = shiftRepository;
         this.taskContractHelperService = taskContractHelperService;
+        this.messageSourceHelper = messageSourceHelper;
     }
 
     protected List<Shift> findAll(Specification<Shift> spec) {
@@ -45,7 +48,7 @@ public class ShiftService extends BaseService<Shift, Integer> {
 
     protected Shift findById(Integer shiftId) {
         return shiftRepository.findById(shiftId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy id ca làm"));
+                .orElseThrow(() -> new BadRequestException(messageSourceHelper.getMessage("error.not_found.shift")));
     }
 
     protected void updateRemainingAmount(Integer shiftId, Integer paymentAmount) {
@@ -70,18 +73,21 @@ public class ShiftService extends BaseService<Shift, Integer> {
         LocalTime startTime = shiftRequest.getStartTime();
         LocalTime endTime = shiftRequest.getEndTime();
 
-        if (shiftRequest.getWorkDate().isBefore(LocalDate.now())
-                || (
-                        shiftRequest.getWorkDate().isEqual(LocalDate.now())
-                                && (shiftRequest.getStartTime().isBefore(LocalTime.now())
-                                || shiftRequest.getEndTime().isBefore(LocalTime.now())))
-                || shiftRequest.getStartTime().isAfter(shiftRequest.getEndTime())
-        ) {
-            throw new RuntimeException("Thời gian bắt đầu và kết thúc từ hôm nay trở đi và thời gian bắt đầu lớn hơn thời gian kết thúc");
+        boolean isPastTime = shiftRequest.getWorkDate().isBefore(LocalDate.now())
+                || (shiftRequest.getWorkDate().isEqual(LocalDate.now())
+                && (shiftRequest.getStartTime().isBefore(LocalTime.now())
+                || shiftRequest.getEndTime().isBefore(LocalTime.now())));
+
+        if (isPastTime) {
+            throw new BadRequestException(messageSourceHelper.getMessage("error.time.must_be_future"));
+        }
+
+        if (shiftRequest.getStartTime().isAfter(shiftRequest.getEndTime())) {
+            throw new BadRequestException(messageSourceHelper.getMessage("error.time.start_after_end"));
         }
 
         if (!isNonOverlapping(startTime, endTime, existingShifts)) {
-            throw new RuntimeException("Bị trùng ca làm trước đó");
+            throw new BadRequestException(messageSourceHelper.getMessage("error.shift.overlap"));
         }
 
         Shift shift = toShift(shiftRequest);
@@ -93,7 +99,7 @@ public class ShiftService extends BaseService<Shift, Integer> {
     protected List<ShiftResponse> getShiftListByTaskContractId(Integer taskContractId) {
         TaskContract taskContract = taskContractHelperService.findById(taskContractId);
         if (!shiftRepository.existsByTaskContractId(taskContract)) {
-            throw new RuntimeException("Không tìm thấy id của đầu việc trong hợp đồng");
+            throw new BadRequestException(messageSourceHelper.getMessage("error.not_found.task_contract"));
         }
 
         List<Shift> shifts = shiftRepository.findShiftListByTaskContractId(taskContractId);
@@ -111,7 +117,7 @@ public class ShiftService extends BaseService<Shift, Integer> {
     public PaginationResponse<ShiftResponse> getAllShiftByTaskContractId(int page, int perPage, Integer taskContractId) {
         TaskContract taskContract = taskContractHelperService.findById(taskContractId);
         if (!shiftRepository.existsByTaskContractId(taskContract)) {
-            throw new RuntimeException("Không tìm thấy id của đầu việc trong hợp đồng");
+            throw new BadRequestException(messageSourceHelper.getMessage("error.not_found.task_contract"));
         }
 
         long totalRecord = shiftRepository.countAllShiftByTaskContractId(taskContractId);
