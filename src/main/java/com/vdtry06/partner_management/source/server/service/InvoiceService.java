@@ -37,14 +37,13 @@ public class InvoiceService extends BaseService<Invoice, Integer> {
         TaskContract taskContract = shift.getTaskContractId();
         Contract contract = taskContract.getContractId();
         Partner partner = contract.getPartnerId();
-        ConfirmInvoiceResponse confirmInvoiceResponse = ConfirmInvoiceResponse.builder()
+        return ConfirmInvoiceResponse.builder()
                 .invoiceResponse(toInvoiceResponse(invoice))
                 .shiftResponse(shiftService.toShiftResponse(shift))
                 .nameAccountant(accountantService.getCurrentAccountant().getFullname())
                 .nameContract(contract.getContractName())
                 .namePatner(partner.getNamePartner())
                 .build();
-        return confirmInvoiceResponse;
     }
 
     public InvoiceResponse createInvoice(Integer shiftId) {
@@ -56,7 +55,6 @@ public class InvoiceService extends BaseService<Invoice, Integer> {
 
         InvoiceStatus status;
         if (shift.getRemainingAmount() == 0) {
-            status = InvoiceStatus.PAID;
             throw new RuntimeException("Ca làm đã thanh toán hết!");
         } else if (shift.getRemainingAmount() < remainingAmount) {
             status = InvoiceStatus.PARTIALLY_PAID;
