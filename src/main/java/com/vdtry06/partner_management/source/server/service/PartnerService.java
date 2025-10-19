@@ -1,13 +1,14 @@
 package com.vdtry06.partner_management.source.server.service;
 
 import com.vdtry06.partner_management.lib.api.PaginationResponse;
+import com.vdtry06.partner_management.lib.exceptions.BadRequestException;
 import com.vdtry06.partner_management.lib.utils.PagingUtil;
+import com.vdtry06.partner_management.source.server.config.language.MessageSourceHelper;
 import com.vdtry06.partner_management.source.server.entities.Partner;
 import com.vdtry06.partner_management.source.server.entities.PartnerManager;
 import com.vdtry06.partner_management.source.server.payload.partner.PartnerRequest;
 import com.vdtry06.partner_management.source.server.payload.partner.PartnerResponse;
 import com.vdtry06.partner_management.source.server.repositories.PartnerRepository;
-import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,15 +19,17 @@ import java.util.List;
 public class PartnerService {
     private final PartnerRepository partnerRepository;
     private final PartnerManagerService partnerManagerService;
+    private final MessageSourceHelper messageSourceHelper;
 
-    protected PartnerService(PartnerRepository partnerRepository, PartnerManagerService partnerManagerService) {
+    protected PartnerService(PartnerRepository partnerRepository, PartnerManagerService partnerManagerService, MessageSourceHelper messageSourceHelper) {
         this.partnerRepository = partnerRepository;
         this.partnerManagerService = partnerManagerService;
+        this.messageSourceHelper = messageSourceHelper;
     }
 
     protected Partner findById(Integer partnerId) {
         return partnerRepository.findById(partnerId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy id đối tác"));
+                .orElseThrow(() -> new BadRequestException(messageSourceHelper.getMessage("error.not_found.partner")));
     }
 
     protected boolean existsById(Integer partnerId) {
@@ -38,7 +41,7 @@ public class PartnerService {
         PartnerManager partnerManager = partnerManagerService.getCurrentPartnerManager();
 
         if (partnerRepository.existsByNamePartner(partnerRequest.getNamePartner())) {
-            throw new RuntimeException("Tên đối tác đã có trong hệ thống");
+            throw new BadRequestException(messageSourceHelper.getMessage("error.partner.name_exists"));
         }
 
         Partner partner = toPartner(partnerRequest);
@@ -51,7 +54,7 @@ public class PartnerService {
     @Transactional(readOnly = true)
     public PartnerResponse getPartnerById(Integer partnerId) {
         Partner partner =  partnerRepository.findById(partnerId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đối tác có id: " + partnerId));
+                .orElseThrow(() -> new BadRequestException(messageSourceHelper.getMessage("error.not_found.partner")));
         return toPartnerResponse(partner);
     }
 

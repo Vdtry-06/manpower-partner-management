@@ -2,14 +2,15 @@ package com.vdtry06.partner_management.source.server.service;
 
 import com.vdtry06.partner_management.lib.enumerated.InvoiceStatus;
 import com.vdtry06.partner_management.lib.enumerated.PaymentMethod;
+import com.vdtry06.partner_management.lib.exceptions.BadRequestException;
 import com.vdtry06.partner_management.lib.repository.BaseRepository;
 import com.vdtry06.partner_management.lib.service.BaseService;
+import com.vdtry06.partner_management.source.server.config.language.MessageSourceHelper;
 import com.vdtry06.partner_management.source.server.entities.*;
 import com.vdtry06.partner_management.source.server.payload.invoice.ConfirmInvoiceResponse;
 import com.vdtry06.partner_management.source.server.payload.invoice.InvoiceRequest;
 import com.vdtry06.partner_management.source.server.payload.invoice.InvoiceResponse;
 import com.vdtry06.partner_management.source.server.repositories.InvoiceRepository;
-import com.vdtry06.partner_management.source.server.repositories.ShiftRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,17 +21,19 @@ public class InvoiceService extends BaseService<Invoice, Integer> {
     private final InvoiceRepository invoiceRepository;
     private final AccountantService accountantService;
     private final ShiftService shiftService;
+    private final MessageSourceHelper messageSourceHelper;
 
-    public InvoiceService(BaseRepository<Invoice, Integer> repository, InvoiceRepository invoiceRepository, AccountantService accountantService, ShiftService shiftService) {
+    public InvoiceService(BaseRepository<Invoice, Integer> repository, InvoiceRepository invoiceRepository, AccountantService accountantService, ShiftService shiftService, MessageSourceHelper messageSourceHelper) {
         super(repository);
         this.invoiceRepository = invoiceRepository;
         this.accountantService = accountantService;
         this.shiftService = shiftService;
+        this.messageSourceHelper = messageSourceHelper;
     }
 
     public ConfirmInvoiceResponse getInvoice(Integer invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy id của hóa đơn"));
+                .orElseThrow(() -> new BadRequestException(messageSourceHelper.getMessage("error.not_found.invoice")));
         Shift shift = invoice.getShiftId();
         TaskContract taskContract = shift.getTaskContractId();
         Contract contract = taskContract.getContractId();
@@ -52,7 +55,7 @@ public class InvoiceService extends BaseService<Invoice, Integer> {
 
         InvoiceStatus status;
         if (shift.getRemainingAmount() == 0) {
-            throw new RuntimeException("Ca làm đã thanh toán hết!");
+            throw new BadRequestException(messageSourceHelper.getMessage("warning.shift.paid_already"));
         } else if (shift.getRemainingAmount() < remainingAmount) {
             status = InvoiceStatus.PARTIALLY_PAID;
         } else {
@@ -72,10 +75,10 @@ public class InvoiceService extends BaseService<Invoice, Integer> {
 
     public InvoiceResponse updateInvoice(Integer invoiceId, InvoiceRequest invoiceRequest) {
         Invoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy id hóa đơn"));
+                .orElseThrow(() -> new BadRequestException(messageSourceHelper.getMessage("error.not_found.invoice")));
 
         if (invoice.getPaymentAmount() != null) {
-            throw new RuntimeException("Hóa đơn này đã được cập nhật hoặc thanh toán, vui lòng tạo hóa đơn mới.");
+            throw new BadRequestException(messageSourceHelper.getMessage("warning.invoice.already_processed"));
         }
 
         Shift shift = invoice.getShiftId();
@@ -83,7 +86,7 @@ public class InvoiceService extends BaseService<Invoice, Integer> {
         int paymentAmount = invoiceRequest.getPaymentAmount();
 
         if (paymentAmount > remainingAmount) {
-            throw new RuntimeException("Tiền trả phải nhỏ hơn hoặc bằng số tiền còn lại phải trả");
+            throw new BadRequestException(messageSourceHelper.getMessage("error.payment.exceeds_due"));
         }
 
         if (paymentAmount < remainingAmount) {
