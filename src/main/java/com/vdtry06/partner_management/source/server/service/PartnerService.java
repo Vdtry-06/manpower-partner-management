@@ -6,8 +6,6 @@ import com.vdtry06.partner_management.source.server.entities.Partner;
 import com.vdtry06.partner_management.source.server.entities.PartnerManager;
 import com.vdtry06.partner_management.source.server.payload.partner.PartnerRequest;
 import com.vdtry06.partner_management.source.server.payload.partner.PartnerResponse;
-import com.vdtry06.partner_management.source.server.repositories.EmployeeRepository;
-import com.vdtry06.partner_management.source.server.repositories.PartnerManagerRepository;
 import com.vdtry06.partner_management.source.server.repositories.PartnerRepository;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
@@ -20,16 +18,19 @@ import java.util.List;
 public class PartnerService {
     private final PartnerRepository partnerRepository;
     private final PartnerManagerService partnerManagerService;
-    private final PartnerManagerRepository partnerManagerRepository;
-    private final EmployeeRepository employeeRepository;
-    private final EmployeeService employeeService;
 
-    public PartnerService(PartnerRepository partnerRepository, PartnerManagerService partnerManagerService, PartnerManagerRepository partnerManagerRepository, EmployeeRepository employeeRepository, EmployeeService employeeService) {
+    protected PartnerService(PartnerRepository partnerRepository, PartnerManagerService partnerManagerService) {
         this.partnerRepository = partnerRepository;
         this.partnerManagerService = partnerManagerService;
-        this.partnerManagerRepository = partnerManagerRepository;
-        this.employeeRepository = employeeRepository;
-        this.employeeService = employeeService;
+    }
+
+    protected Partner findById(Integer partnerId) {
+        return partnerRepository.findById(partnerId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy id đối tác"));
+    }
+
+    protected boolean existsById(Integer partnerId) {
+        return partnerRepository.existsById(partnerId);
     }
 
     @Transactional(rollbackFor = BadRequestException.class)

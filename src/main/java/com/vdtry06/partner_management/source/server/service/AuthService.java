@@ -23,23 +23,18 @@ import java.util.UUID;
 @Service
 @Log4j2
 public class AuthService {
-    private final EmployeeService employeeService;
     private final EmployeeRepository employeeRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
-    private final TokenBlacklistService tokenBlacklistService;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
 
-    public AuthService(EmployeeService employeeService, EmployeeRepository employeeRepository,
-                       AuthenticationManager authenticationManager, JwtProvider jwtProvider,
-                       TokenBlacklistService tokenBlacklistService, BlacklistedTokenRepository blacklistedTokenRepository) {
-        this.employeeService = employeeService;
+    public AuthService(EmployeeRepository employeeRepository, AuthenticationManager authenticationManager, JwtProvider jwtProvider, BlacklistedTokenRepository blacklistedTokenRepository) {
         this.employeeRepository = employeeRepository;
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
-        this.tokenBlacklistService = tokenBlacklistService;
         this.blacklistedTokenRepository = blacklistedTokenRepository;
     }
+
 
     public LoginResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -105,5 +100,4 @@ public class AuthService {
             throw new RuntimeException("Logout failed", e);
         }
     }
-
 }

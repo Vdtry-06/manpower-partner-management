@@ -23,6 +23,11 @@ public class TaskService extends BaseService<Task, Integer> {
         this.taskRepository = taskRepository;
     }
 
+    protected Task findById(Integer taskId) {
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy id của đầu việc"));
+    }
+
 
     public TaskResponse getTaskById(Integer taskId) {
         Task task = taskRepository.findById(taskId).orElse(null);
@@ -57,7 +62,7 @@ public class TaskService extends BaseService<Task, Integer> {
         if (tasks != null) {
             taskResponses = tasks
                     .stream()
-                    .map(task -> toTaskResponse(task))
+                    .map(this::toTaskResponse)
                     .toList()
             ;
         }

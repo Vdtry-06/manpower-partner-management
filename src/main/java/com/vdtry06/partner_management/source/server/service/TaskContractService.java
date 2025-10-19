@@ -5,15 +5,17 @@ import com.vdtry06.partner_management.lib.repository.BaseRepository;
 import com.vdtry06.partner_management.lib.service.BaseService;
 import com.vdtry06.partner_management.lib.utils.PagingUtil;
 import com.vdtry06.partner_management.source.server.entities.Contract;
+import com.vdtry06.partner_management.source.server.entities.Shift;
 import com.vdtry06.partner_management.source.server.entities.Task;
 import com.vdtry06.partner_management.source.server.entities.TaskContract;
 import com.vdtry06.partner_management.source.server.payload.shift.ShiftResponse;
 import com.vdtry06.partner_management.source.server.payload.task.TaskResponse;
 import com.vdtry06.partner_management.source.server.payload.taskcontract.ShiftTaskListContractResponse;
 import com.vdtry06.partner_management.source.server.payload.taskcontract.TaskContractResponse;
-import com.vdtry06.partner_management.source.server.repositories.ContractRepository;
 import com.vdtry06.partner_management.source.server.repositories.TaskContractRepository;
-import com.vdtry06.partner_management.source.server.repositories.TaskRepository;
+import com.vdtry06.partner_management.source.server.repositories.spec.ShiftSpecification;
+import com.vdtry06.partner_management.source.server.service.helpers.ContractHelperService;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,26 +24,53 @@ import java.util.List;
 
 @Service
 public class TaskContractService extends BaseService<TaskContract, Integer> {
-    public final TaskContractRepository taskContractRepository;
-    public final ContractRepository contractRepository;
-    public final TaskRepository taskRepository;
-    public final ShiftService shiftService;
-    public final TaskService taskService;
-    public final ShiftTaskCalculationService shiftTaskCalculationService;
+    private final TaskContractRepository taskContractRepository;
+    private final ShiftService shiftService;
+    private final TaskService taskService;
+    private final ContractHelperService contractHelperService;
 
-    public TaskContractService(BaseRepository<TaskContract, Integer> repository, TaskContractRepository taskContractRepository, ContractRepository contractRepository, TaskRepository taskRepository, ShiftService shiftService, TaskService taskService, ShiftTaskCalculationService shiftTaskCalculationService) {
+    protected TaskContractService(BaseRepository<TaskContract, Integer> repository, TaskContractRepository taskContractRepository, ShiftService shiftService, TaskService taskService, ContractHelperService contractHelperService) {
         super(repository);
         this.taskContractRepository = taskContractRepository;
-        this.contractRepository = contractRepository;
-        this.taskRepository = taskRepository;
         this.shiftService = shiftService;
         this.taskService = taskService;
-        this.shiftTaskCalculationService = shiftTaskCalculationService;
+        this.contractHelperService = contractHelperService;
+    }
+
+    private Integer totalUnitPriceByTaskContractId(Integer taskContractId) {
+        if (!shiftService.existsByTaskContractId(taskContractId)) {
+            throw new RuntimeException("Không tìm thấy id của đầu việc trong hợp đồng");
+        }
+        Specification<Shift> spec = ShiftSpecification.hasTaskContractId(taskContractId);
+
+        List<Shift> shifts = shiftService.findAll(spec);
+
+        int sumPrice = 0;
+        for (Shift shift : shifts) {
+            sumPrice += shift.getShiftUnitPrice() * shift.getWorkerCount();
+        }
+        return sumPrice;
+    }
+
+    private LocalDate endDateShiftOfTaskContractId(Integer taskContractId) {
+        if (!shiftService.existsByTaskContractId(taskContractId)) {
+            throw new RuntimeException("Không tìm thấy id của đầu việc trong hợp đồng");
+        }
+        Specification<Shift> spec = ShiftSpecification.hasTaskContractId(taskContractId);
+
+        List<Shift> shifts = shiftService.findAll(spec);
+        LocalDate endDate = LocalDate.now();
+        for (Shift shift : shifts) {
+            if (endDate.isBefore(shift.getWorkDate())) {
+                endDate = shift.getWorkDate();
+            }
+        }
+        return endDate;
     }
 
     public PaginationResponse<ShiftTaskListContractResponse> getShiftTaskListOfContract(int page, int perPage, Integer contractId) {
-        if (!contractRepository.existsById(contractId)) throw new RuntimeException("Không tìm thấy id của hợp đồng");
-        List<TaskContract> taskContracts = taskContractRepository.findByContractId(contractRepository.findById(contractId).orElse(null));
+        if (!contractHelperService.existsById(contractId)) throw new RuntimeException("Không tìm thấy id của hợp đồng");
+        List<TaskContract> taskContracts = taskContractRepository.findByContractId(contractHelperService.findById(contractId));
 
         List<ShiftTaskListContractResponse> shiftTaskListContractResponses = new ArrayList<>();
         for (TaskContract taskContract : taskContracts) {
@@ -79,7 +108,7 @@ public class TaskContractService extends BaseService<TaskContract, Integer> {
     }
 
     protected String getListNameTasks(Integer contractId) {
-        Contract contract = contractRepository.findById(contractId).orElse(null);
+        Contract contract = contractHelperService.findById(contractId);
         List<TaskContract> taskContracts = taskContractRepository.findByContractId(contract);
         String description = "";
         for (TaskContract taskContract : taskContracts) {
@@ -90,7 +119,7 @@ public class TaskContractService extends BaseService<TaskContract, Integer> {
     }
 
     protected Integer totalTasksUnitPrice(Integer contractId) {
-        Contract contract = contractRepository.findById(contractId).orElse(null);
+        Contract contract = contractHelperService.findById(contractId);
         List<TaskContract> taskContracts = taskContractRepository.findByContractId(contract);
         Integer totalPrice = 0;
         for (TaskContract taskContract : taskContracts) {
@@ -103,17 +132,17 @@ public class TaskContractService extends BaseService<TaskContract, Integer> {
         TaskContract taskContract = taskContractRepository.findById(taskContractId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy id của đầu việc trong hợp đồng"));
 
-        taskContract.setTaskUnitPrice(shiftTaskCalculationService.totalUnitPriceByTaskContractId(taskContractId));
+        taskContract.setTaskUnitPrice(totalUnitPriceByTaskContractId(taskContractId));
         taskContract = taskContractRepository.save(taskContract);
         return taskContract.getTaskUnitPrice();
     }
 
     protected LocalDate endDateContract(Integer contractId) {
-        Contract contract = contractRepository.findById(contractId).orElse(null);
+        Contract contract = contractHelperService.findById(contractId);
         List<TaskContract> taskContracts = taskContractRepository.findByContractId(contract);
         LocalDate endDate = LocalDate.now();
         for (TaskContract taskContract : taskContracts) {
-            LocalDate endDateByTask = shiftTaskCalculationService.endDateShiftOfTaskContractId(taskContract.getId());
+            LocalDate endDateByTask = endDateShiftOfTaskContractId(taskContract.getId());
             if (endDate.isBefore(endDateByTask)) {
                 endDate = endDateByTask;
             }
@@ -122,8 +151,8 @@ public class TaskContractService extends BaseService<TaskContract, Integer> {
     }
 
     public TaskContractResponse createTaskContract(Integer contractId, Integer taskId) {
-        Contract contract = contractRepository.findById(contractId).orElse(null);
-        Task task = taskRepository.findById(taskId).orElse(null);
+        Contract contract = contractHelperService.findById(contractId);
+        Task task = taskService.findById(taskId);
         TaskContract taskContract = TaskContract.builder()
                 .taskUnitPrice(0)
                 .build();

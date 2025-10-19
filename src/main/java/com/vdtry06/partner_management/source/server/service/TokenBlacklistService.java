@@ -1,6 +1,5 @@
 package com.vdtry06.partner_management.source.server.service;
 
-import com.vdtry06.partner_management.source.server.config.JwtProvider;
 import com.vdtry06.partner_management.source.server.repositories.BlacklistedTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,7 +16,6 @@ import java.util.Set;
 @Log4j2
 public class TokenBlacklistService {
     private final Set<String> blacklistedTokens = new HashSet<>();
-    private final JwtProvider jwtProvider;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
 
     public void blacklistToken(String token) {

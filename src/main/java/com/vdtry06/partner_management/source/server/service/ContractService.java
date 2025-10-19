@@ -10,7 +10,6 @@ import com.vdtry06.partner_management.source.server.entities.Partner;
 import com.vdtry06.partner_management.source.server.entities.PartnerManager;
 import com.vdtry06.partner_management.source.server.payload.contract.ContractResponse;
 import com.vdtry06.partner_management.source.server.repositories.ContractRepository;
-import com.vdtry06.partner_management.source.server.repositories.PartnerRepository;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,48 +21,38 @@ import java.util.List;
 @Service
 public class ContractService extends BaseService<Contract, Integer> {
     private final ContractRepository contractRepository;
-    private final EmployeeService employeeService;
     private final PartnerManagerService partnerManagerService;
-    private final PartnerService partnerService;
-    private final PartnerRepository partnerRepository;
     private final TaskContractService taskContractService;
+    private final PartnerService partnerService;
 
-    public ContractService(BaseRepository<Contract, Integer> repository, ContractRepository contractRepository, EmployeeService employeeService, PartnerManagerService partnerManagerService, PartnerService partnerService, PartnerRepository partnerRepository, TaskContractService taskContractService) {
+    protected ContractService(BaseRepository<Contract, Integer> repository, ContractRepository contractRepository, PartnerManagerService partnerManagerService, PartnerService partnerService, TaskContractService taskContractService) {
         super(repository);
         this.contractRepository = contractRepository;
-        this.employeeService = employeeService;
         this.partnerManagerService = partnerManagerService;
         this.partnerService = partnerService;
-        this.partnerRepository = partnerRepository;
         this.taskContractService = taskContractService;
     }
 
     public ContractResponse getContractByPartnerIdAndContractId(Integer partnerId, Integer contractId) {
-        if (!partnerRepository.existsById(partnerId)) throw new RuntimeException("Không tìm thấy id đối tác");
+        if (!partnerService.existsById(partnerId)) throw new RuntimeException("Không tìm thấy id đối tác");
         Contract contract = contractRepository.findContractByPartnerIdAndContactId(partnerId, contractId);
-//        Specification<Contract> spec = ContractSpecification.hasPartnerId(partnerId)
-//                .and(ContractSpecification.hasPartnerId(contractId));
-//        Contract contract = (Contract) contractRepository.findAll(spec);
 
         return toContractResponse(contract);
     }
 
     @Transactional(readOnly = true)
     public PaginationResponse<ContractResponse> getAllContractsByPartnerId(int page, int perPage, Integer partnerId) {
-        if (!partnerRepository.existsById(partnerId)) throw new RuntimeException("Không tìm thấy id đối tác");
+        if (!partnerService.existsById(partnerId)) throw new RuntimeException("Không tìm thấy id đối tác");
         long totalRecord = contractRepository.countAllContractByPartnerId(partnerId);
         int offset = PagingUtil.getOffSet(page, perPage);
         int totalPage = PagingUtil.getTotalPage(totalRecord, perPage);
         List<Contract> contracts = contractRepository.findAllContractByPartnerId(offset, perPage, partnerId);
 
-//        Specification<Contract> spec = ContractSpecification.hasPartnerId(partnerId);
-//        List<Contract> contracts = contractRepository.findAll(spec);
-
         List<ContractResponse> contractResponses = new ArrayList<>();
         if (contracts != null) {
             contractResponses = contracts
                     .stream()
-                    .map(contract -> toContractResponse(contract))
+                    .map(this::toContractResponse)
                     .toList();
         }
 
@@ -86,8 +75,7 @@ public class ContractService extends BaseService<Contract, Integer> {
     @Transactional(rollbackFor = BadRequestException.class)
     public ContractResponse createContract(Integer partnerId) {
         PartnerManager partnerManager = partnerManagerService.getCurrentPartnerManager();
-        Partner partner = partnerRepository.findById(partnerId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy id đối tác"));
+        Partner partner = partnerService.findById(partnerId);
 
         Contract contract = Contract.builder()
                 .partnerManagerId(partnerManager)
@@ -104,7 +92,12 @@ public class ContractService extends BaseService<Contract, Integer> {
 
     @Transactional(rollbackFor = BadRequestException.class)
     public ContractResponse updateContract(Integer contractId) {
-        Contract contract = contractRepository.findById(contractId).orElse(null);
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy id hợp đồng"));
+
+//        if (contract.getEndDate() != null || contract.getDescription() != null) {
+//            throw new RuntimeException("Id của hợp đồng không phù hợp");
+//        }
         contract.setEndDate(taskContractService.endDateContract(contractId));
         contract.setTotalContractValue(taskContractService.totalTasksUnitPrice(contractId));
         contract.setStatus(ContractStatus.ACTIVE);
@@ -112,18 +105,6 @@ public class ContractService extends BaseService<Contract, Integer> {
         contract = contractRepository.save(contract);
         return toContractResponse(contract);
     }
-
-//    private Contract toContract(ContractRequest contractRequest) {
-//        new Contract();
-//        return Contract.builder()
-//                .contractName(contractRequest.getContractName())
-//                .startDate(contractRequest.getStartDate())
-//                .endDate(contractRequest.getEndDate())
-//                .totalContractValue(contractRequest.getTotalContractValue())
-//                .status(ContractStatus.ACTIVE)
-//                .description(contractRequest.getDescription())
-//                .build();
-//    }
 
     private ContractResponse toContractResponse(Contract contract) {
         new ContractResponse();
