@@ -18,18 +18,20 @@ public class EmployeeService extends BaseService<Employee, Integer> {
         this.employeeRepository = employeeRepository;
     }
 
+    protected Employee findByUsername(String username) {
+        return employeeRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("không tìm thấy tài khoản nhân viên"));
+    }
+
     protected String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (authentication == null || !authentication.isAuthenticated())
             throw new RuntimeException("Người dùng chưa đăng nhập");
-        }
 
         Object principal = authentication.getPrincipal();
-
-        if (principal instanceof UserDetails) {
+        if (principal instanceof UserDetails)
             return ((UserDetails) principal).getUsername();
-        }
 
         throw new RuntimeException("Không thể xác định người dùng hiện tại");
     }
