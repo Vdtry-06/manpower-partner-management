@@ -16,6 +16,5 @@ public class ShiftRequest {
     private LocalTime endTime;
     private Integer workerCount;
     private Integer shiftUnitPrice;
-    private Integer remainingAmount;
     private String description;
 }

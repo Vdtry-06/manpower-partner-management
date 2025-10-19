@@ -23,6 +23,6 @@ public class ContractResponse {
     @Enumerated(EnumType.STRING)
     private ContractStatus status;
     private String description;
-    private PartnerManager partnerManagerId;
-    private Partner partnerId;
+    private Integer partnerManagerId;
+    private Integer partnerId;
 }

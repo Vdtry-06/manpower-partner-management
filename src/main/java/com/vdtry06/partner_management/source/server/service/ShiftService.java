@@ -3,6 +3,7 @@ package com.vdtry06.partner_management.source.server.service;
 import com.vdtry06.partner_management.lib.api.PaginationResponse;
 import com.vdtry06.partner_management.lib.repository.BaseRepository;
 import com.vdtry06.partner_management.lib.service.BaseService;
+import com.vdtry06.partner_management.lib.utils.PagingUtil;
 import com.vdtry06.partner_management.source.server.entities.Shift;
 import com.vdtry06.partner_management.source.server.entities.TaskContract;
 import com.vdtry06.partner_management.source.server.payload.shift.ShiftRequest;
@@ -16,7 +17,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,37 +32,10 @@ public class ShiftService extends BaseService<Shift, Integer> {
         this.taskContractRepository = taskContractRepository;
     }
 
-    protected Integer totalUnitPriceByTaskContractId(Integer taskContractId) {
-        TaskContract taskContract = taskContractRepository.findById(taskContractId).orElse(null);
-        if (!shiftRepository.existsByTaskContractId(taskContract)) {
-            throw new RuntimeException("Không tìm thấy id của đầu việc trong hợp đồng");
-        }
-        Specification<Shift> spec = ShiftSpecification.hasTaskContractId(taskContractId);
-
-        List<Shift> shifts = shiftRepository.findAll(spec);
-
-        Integer sumPrice = 0;
-        for (Shift shift : shifts) {
-            sumPrice += shift.getShiftUnitPrice() * shift.getWorkerCount();
-        }
-        return sumPrice;
-    }
-
-    protected LocalDate endDateShiftOfTaskContractId(Integer taskContractId) {
-        TaskContract taskContract = taskContractRepository.findById(taskContractId).orElse(null);
-        if (!shiftRepository.existsByTaskContractId(taskContract)) {
-            throw new RuntimeException("Không tìm thấy id của đầu việc trong hợp đồng");
-        }
-        Specification<Shift> spec = ShiftSpecification.hasTaskContractId(taskContractId);
-
-        List<Shift> shifts = shiftRepository.findAll(spec);
-        LocalDate endDate = LocalDate.now();
-        for (Shift shift : shifts) {
-            if (endDate.isBefore(shift.getWorkDate())) {
-                endDate = shift.getWorkDate();
-            }
-        }
-        return endDate;
+    protected void updateRemainingAmount(Integer shiftId, Integer paymentAmount) {
+        Shift shift = shiftRepository.findById(shiftId).orElse(null);
+        shift.setRemainingAmount(shift.getRemainingAmount() - paymentAmount);
+        shiftRepository.save(shift);
     }
 
     @Transactional(rollbackFor = BadRequestException.class)
@@ -100,14 +73,37 @@ public class ShiftService extends BaseService<Shift, Integer> {
         return toShiftResponse(shift);
     }
 
-    public PaginationResponse<ShiftResponse> getAllShiftByTaskContractId(Integer taskContractId) {
+    protected List<ShiftResponse> getShiftListByTaskContractId(Integer taskContractId) {
         TaskContract taskContract = taskContractRepository.findById(taskContractId).orElse(null);
         if (!shiftRepository.existsByTaskContractId(taskContract)) {
             throw new RuntimeException("Không tìm thấy id của đầu việc trong hợp đồng");
         }
-        Specification<Shift> spec = ShiftSpecification.hasTaskContractId(taskContractId);
 
-        List<Shift> shifts = shiftRepository.findAll(spec);
+        List<Shift> shifts = shiftRepository.findShiftListByTaskContractId(taskContractId);
+        List<ShiftResponse> shiftResponses = new ArrayList<>();
+        if (shifts != null) {
+            shiftResponses = shifts
+                    .stream()
+                    .map(this::toShiftResponse)
+                    .toList()
+            ;
+        }
+        return shiftResponses;
+    }
+
+    public PaginationResponse<ShiftResponse> getAllShiftByTaskContractId(int page, int perPage, Integer taskContractId) {
+        TaskContract taskContract = taskContractRepository.findById(taskContractId).orElse(null);
+        if (!shiftRepository.existsByTaskContractId(taskContract)) {
+            throw new RuntimeException("Không tìm thấy id của đầu việc trong hợp đồng");
+        }
+//        Specification<Shift> spec = ShiftSpecification.hasTaskContractId(taskContractId);
+//
+//        List<Shift> shifts = shiftRepository.findAll(spec);
+
+        long totalRecord = shiftRepository.countAllShiftByTaskContractId(taskContractId);
+        int offset = PagingUtil.getOffSet(page, perPage);
+        int totalPage = PagingUtil.getTotalPage(totalRecord, perPage);
+        List<Shift> shifts = shiftRepository.findAllShiftByTaskContractId(offset, perPage, taskContractId);
 
         List<ShiftResponse> shiftResponses = new ArrayList<>();
         if (shifts != null) {
@@ -118,7 +114,11 @@ public class ShiftService extends BaseService<Shift, Integer> {
             ;
         }
         return PaginationResponse.<ShiftResponse>builder()
+                .page(page)
+                .perPage(perPage)
                 .data(shiftResponses)
+                .totalPage(totalPage)
+                .totalRecord(totalRecord)
                 .build();
     }
 
@@ -142,12 +142,12 @@ public class ShiftService extends BaseService<Shift, Integer> {
                 .endTime(shiftRequest.getEndTime())
                 .workerCount(shiftRequest.getWorkerCount())
                 .shiftUnitPrice(shiftRequest.getShiftUnitPrice())
-                .remainingAmount(0)
+                .remainingAmount(shiftRequest.getWorkerCount() * shiftRequest.getShiftUnitPrice())
                 .description(shiftRequest.getDescription())
                 .build();
     }
 
-    private ShiftResponse toShiftResponse(Shift shift) {
+    protected ShiftResponse toShiftResponse(Shift shift) {
         new ShiftResponse();
         return ShiftResponse.builder()
                 .id(shift.getId())
