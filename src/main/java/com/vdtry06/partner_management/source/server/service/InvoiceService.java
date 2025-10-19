@@ -20,14 +20,12 @@ public class InvoiceService extends BaseService<Invoice, Integer> {
     private final InvoiceRepository invoiceRepository;
     private final AccountantService accountantService;
     private final ShiftService shiftService;
-    private final ShiftRepository shiftRepository;
 
-    public InvoiceService(BaseRepository<Invoice, Integer> repository, InvoiceRepository invoiceRepository, AccountantService accountantService, ShiftService shiftService, ShiftRepository shiftRepository) {
+    public InvoiceService(BaseRepository<Invoice, Integer> repository, InvoiceRepository invoiceRepository, AccountantService accountantService, ShiftService shiftService) {
         super(repository);
         this.invoiceRepository = invoiceRepository;
         this.accountantService = accountantService;
         this.shiftService = shiftService;
-        this.shiftRepository = shiftRepository;
     }
 
     public ConfirmInvoiceResponse getInvoice(Integer invoiceId) {
@@ -48,8 +46,7 @@ public class InvoiceService extends BaseService<Invoice, Integer> {
 
     public InvoiceResponse createInvoice(Integer shiftId) {
         Accountant accountant = accountantService.getCurrentAccountant();
-        Shift shift = shiftRepository.findById(shiftId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy id ca làm"));
+        Shift shift = shiftService.findById(shiftId);
 
         Integer remainingAmount = shift.getShiftUnitPrice() * shift.getWorkerCount();
 
