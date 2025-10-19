@@ -1,4 +1,4 @@
-package com.vdtry06.partner_management.source.server.config;
+package com.vdtry06.partner_management.source.server.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
