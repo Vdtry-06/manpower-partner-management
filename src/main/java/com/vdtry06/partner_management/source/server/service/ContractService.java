@@ -123,4 +123,5 @@ public class ContractService extends BaseService<Contract, Integer> {
                 .partnerId(contract.getPartnerId().getId())
                 .build();
     }
+
 }

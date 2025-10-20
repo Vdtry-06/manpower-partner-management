@@ -12,7 +12,6 @@ import com.vdtry06.partner_management.source.server.payload.auth.LoginResponse;
 import com.vdtry06.partner_management.source.server.payload.auth.LogoutRequest;
 import com.vdtry06.partner_management.source.server.payload.auth.TokenResponse;
 import com.vdtry06.partner_management.source.server.repositories.BlacklistedTokenRepository;
-import com.vdtry06.partner_management.source.server.repositories.EmployeeRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,14 +27,14 @@ import java.util.UUID;
 @Service
 @Log4j2
 public class AuthService {
-    private final EmployeeRepository employeeRepository;
+    private final EmployeeService employeeService;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
     private final MessageSourceHelper messageSourceHelper;
 
-    public AuthService(EmployeeRepository employeeRepository, AuthenticationManager authenticationManager, JwtProvider jwtProvider, BlacklistedTokenRepository blacklistedTokenRepository, MessageSourceHelper messageSourceHelper) {
-        this.employeeRepository = employeeRepository;
+    public AuthService(EmployeeService employeeService, AuthenticationManager authenticationManager, JwtProvider jwtProvider, BlacklistedTokenRepository blacklistedTokenRepository, MessageSourceHelper messageSourceHelper) {
+        this.employeeService = employeeService;
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
         this.blacklistedTokenRepository = blacklistedTokenRepository;
@@ -45,21 +44,21 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest loginRequest) {
         log.info("Current Locale: {}", LanguageContext.getLocale());
+        boolean check = false;
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        Employee employee = employeeRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new BadRequestException(messageSourceHelper.getMessage("error.user_not_found")));
+        Employee employee = employeeService.findByUsername(loginRequest.getUsername());
 
         final String accessToken = jwtProvider.generateToken(employee.getUsername());
         final String refreshToken = UUID.randomUUID().toString();
+        check = true;
 
         return LoginResponse.builder()
                 .id(employee.getId())
-                .username(employee.getUsername())
-                .fullname(employee.getFullname())
+                .check(check)
                 .token(TokenResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)

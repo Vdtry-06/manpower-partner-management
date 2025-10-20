@@ -22,7 +22,7 @@ public class ContractController {
             @PathVariable int partnerId,
             @PathVariable int contractId
     ) {
-        return new ApiResponse<ContractResponse>(true, contractService.getContractByPartnerIdAndContractId(partnerId, contractId));
+        return new ApiResponse<>(true, contractService.getContractByPartnerIdAndContractId(partnerId, contractId));
     }
 
     @GetMapping("/get-all-contracts-of-partner/{partnerId}")
@@ -36,19 +36,19 @@ public class ContractController {
 
     @GetMapping("/{id}")
     public ApiResponse<ContractResponse> getContractById(@PathVariable int id) {
-        return new ApiResponse<ContractResponse>(true, contractService.getContractById(id));
+        return new ApiResponse<>(true, contractService.getContractById(id));
     }
 
     @PostMapping("/add/{partnerId}")
     @PreAuthorize("hasAuthority('PARTNER_MANAGER')")
     public ApiResponse<ContractResponse> createContract(@PathVariable int partnerId) {
-        return new ApiResponse<ContractResponse>(true, contractService.createContract(partnerId));
+        return new ApiResponse<>(true, contractService.createContract(partnerId));
     }
 
     @PostMapping("/update/{contractId}")
     @PreAuthorize("hasAuthority('PARTNER_MANAGER')")
     public ApiResponse<ContractResponse> updateContract(@PathVariable int contractId) {
-        return new ApiResponse<ContractResponse>(true, contractService.updateContract(contractId));
+        return new ApiResponse<>(true, contractService.updateContract(contractId));
     }
 
 }

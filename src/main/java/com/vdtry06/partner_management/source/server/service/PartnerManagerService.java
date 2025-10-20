@@ -6,6 +6,7 @@ import com.vdtry06.partner_management.lib.service.BaseService;
 import com.vdtry06.partner_management.source.server.config.language.MessageSourceHelper;
 import com.vdtry06.partner_management.source.server.entities.Employee;
 import com.vdtry06.partner_management.source.server.entities.PartnerManager;
+import com.vdtry06.partner_management.source.server.payload.partnermanager.PartnerManagerResponse;
 import com.vdtry06.partner_management.source.server.repositories.PartnerManagerRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,16 @@ public class PartnerManagerService extends BaseService<PartnerManager, Integer> 
         this.employeeService = employeeService;
         this.partnerManagerRepository = partnerManagerRepository;
         this.messageSourceHelper = messageSourceHelper;
+    }
+
+    public PartnerManagerResponse getPartnerManagerInfor() {
+        PartnerManager partnerManager = getCurrentPartnerManager();
+        return PartnerManagerResponse.builder()
+                .id(partnerManager.getId())
+                .username(partnerManager.getUsername())
+                .fullname(partnerManager.getFullname())
+                .position(partnerManager.getPosition())
+                .build();
     }
 
     protected PartnerManager getCurrentPartnerManager() {

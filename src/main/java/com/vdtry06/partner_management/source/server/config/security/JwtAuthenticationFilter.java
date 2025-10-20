@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String path = request.getRequestURI();
-            String[] publicUrls = {"/auth/login"};
+            String[] publicUrls = {"/auth/login" };
 
             for (String publicUrl : publicUrls) {
                 if (path.equals(publicUrl)) {

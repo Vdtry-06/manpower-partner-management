@@ -22,12 +22,12 @@ public class PartnerController {
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('PARTNER_MANAGER')")
     public ApiResponse<PartnerResponse> createPartner(@RequestBody PartnerRequest partnerRequest) {
-        return new ApiResponse<PartnerResponse>(true, partnerService.createPartner(partnerRequest));
+        return new ApiResponse<>(true, partnerService.createPartner(partnerRequest));
     }
 
     @GetMapping("/{id}")
     public ApiResponse<PartnerResponse> getPartnerById(@PathVariable int id) {
-        return new ApiResponse<PartnerResponse>(true, partnerService.getPartnerById(id));
+        return new ApiResponse<>(true, partnerService.getPartnerById(id));
     }
 
     @GetMapping
