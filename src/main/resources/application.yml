@@ -18,6 +18,11 @@ spring:
   messages:
     encoding: UTF-8
 
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
 jwt:
   secret-key: "${JWT_SIGNER_KEY:s^u0DN^i@lnxshKC2fDRZBv9CcwYv9Q#BNutL5jdtKo=}"
   access-token:

@@ -43,6 +43,9 @@ public class PartnerService {
         if (partnerRepository.existsByNamePartner(partnerRequest.getNamePartner())) {
             throw new BadRequestException(messageSourceHelper.getMessage("error.partner.name_exists"));
         }
+        if (partnerRepository.existsByTaxCode(partnerRequest.getTaxCode())) {
+            throw new BadRequestException("Mã số thuế đã tồn tại");
+        }
 
         Partner partner = toPartner(partnerRequest);
         partner.setPartnerManagerId(partnerManager);

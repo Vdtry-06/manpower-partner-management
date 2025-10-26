@@ -90,6 +90,10 @@ public class ShiftService extends BaseService<Shift, Integer> {
             throw new BadRequestException(messageSourceHelper.getMessage("error.shift.overlap"));
         }
 
+        if (shiftRequest.getWorkerCount() <= 0) {
+            throw new BadRequestException("Số lượng nhân công phải > 0");
+        }
+
         Shift shift = toShift(shiftRequest);
         shift.setTaskContractId(taskContract);
         shift = shiftRepository.save(shift);

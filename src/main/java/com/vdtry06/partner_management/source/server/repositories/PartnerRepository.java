@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface PartnerRepository extends BaseRepository<Partner, Integer> {
 
+    boolean existsByTaxCode(String taxCode);
+
     boolean existsByNamePartner(String namePartner);
 
     @Query(

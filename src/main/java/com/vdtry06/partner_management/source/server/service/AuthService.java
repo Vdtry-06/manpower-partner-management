@@ -41,24 +41,26 @@ public class AuthService {
         this.messageSourceHelper = messageSourceHelper;
     }
 
-
     public LoginResponse login(LoginRequest loginRequest) {
-        log.info("Current Locale: {}", LanguageContext.getLocale());
-        boolean check = false;
+        log.info("Attempting login for user: {}, Locale: {}", loginRequest.getUsername(), LanguageContext.getLocale());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         Employee employee = employeeService.findByUsername(loginRequest.getUsername());
+        if (employee == null) {
+            throw new BadRequestException(messageSourceHelper.getMessage("error.user_not_found"));
+        }
 
         final String accessToken = jwtProvider.generateToken(employee.getUsername());
         final String refreshToken = UUID.randomUUID().toString();
-        check = true;
+        log.info("Generated accessToken: {}, refreshToken: {}", accessToken, refreshToken);
 
         return LoginResponse.builder()
                 .id(employee.getId())
-                .check(check)
+                .check(true)
+                .position(employee.getPosition())
                 .token(TokenResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
@@ -70,15 +72,13 @@ public class AuthService {
         log.info("Logout request received");
 
         try {
-            // Lấy access token từ SecurityContext (được set trong JwtAuthenticationFilter)
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String accessToken = null;
 
-            if (authentication != null && authentication.getCredentials() != null) {
-                accessToken = authentication.getCredentials().toString();
+            if (authentication != null && authentication.getCredentials() instanceof String) {
+                accessToken = (String) authentication.getCredentials();
             }
 
-            // Blacklist access token
             if (accessToken != null && jwtProvider.validateToken(accessToken)) {
                 String jwtId = jwtProvider.getJwtIdFromToken(accessToken);
                 Date expiryTime = jwtProvider.parseClaims(accessToken).getExpirationTime();
@@ -88,20 +88,17 @@ public class AuthService {
                             .id(jwtId)
                             .expiryTime(expiryTime)
                             .build();
-
                     blacklistedTokenRepository.save(blacklistedToken);
                     log.info("Access token blacklisted: {}", jwtId);
                 }
             }
 
-            // Nếu có refresh token trong request (dù là UUID string, vẫn lưu để tracking)
             if (request != null && request.getToken() != null) {
                 log.info("Refresh token invalidated: {}", request.getToken());
             }
 
             SecurityContextHolder.clearContext();
             log.info("Logout completed successfully");
-
         } catch (Exception e) {
             log.error("Error during logout: {}", e.getMessage());
             throw new BadRequestException(messageSourceHelper.getMessage("error.logout_failed"));

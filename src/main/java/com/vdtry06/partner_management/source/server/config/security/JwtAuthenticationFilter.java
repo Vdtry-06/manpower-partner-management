@@ -4,6 +4,7 @@ import com.vdtry06.partner_management.source.server.config.language.MessageSourc
 import com.vdtry06.partner_management.source.server.repositories.BlacklistedTokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String path = request.getRequestURI();
-            String[] publicUrls = {"/auth/login" };
+            String[] publicUrls = {"/auth/login"};
 
             for (String publicUrl : publicUrls) {
                 if (path.equals(publicUrl)) {
@@ -44,8 +45,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = jwtProvider.getJwtFromRequest(request);
 
             if (jwt == null) {
-                filterChain.doFilter(request, response);
-                return;
+                // Lấy từ cookie
+                if (request.getCookies() != null) {
+                    for (Cookie c : request.getCookies()) {
+                        if ("token".equals(c.getName())) {
+                            jwt = c.getValue();
+                            break;
+                        }
+                    }
+                }
             }
 
             // Kiểm tra blacklist bằng JWT ID

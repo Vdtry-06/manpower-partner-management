@@ -40,7 +40,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/auth/login", "/WEB-INF/**", "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/auth/logout").authenticated()
                         .anyRequest().authenticated()
                 )

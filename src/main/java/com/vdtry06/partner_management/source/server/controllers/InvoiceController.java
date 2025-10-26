@@ -1,14 +1,15 @@
 package com.vdtry06.partner_management.source.server.controllers;
 
-import com.vdtry06.partner_management.lib.api.ApiResponse;
 import com.vdtry06.partner_management.source.server.payload.invoice.ConfirmInvoiceResponse;
 import com.vdtry06.partner_management.source.server.payload.invoice.InvoiceRequest;
 import com.vdtry06.partner_management.source.server.payload.invoice.InvoiceResponse;
 import com.vdtry06.partner_management.source.server.service.InvoiceService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@Controller
 @RequestMapping("/invoice")
 public class InvoiceController {
     private final InvoiceService invoiceService;
@@ -18,18 +19,39 @@ public class InvoiceController {
     }
 
     @GetMapping("/get/{id}")
-    public ApiResponse<ConfirmInvoiceResponse> getInvoice(@PathVariable int id) {
-        return new ApiResponse<ConfirmInvoiceResponse>(true, invoiceService.getInvoice(id));
+    public String getInvoice(@PathVariable int id, Model model) {
+        ConfirmInvoiceResponse response = invoiceService.getInvoice(id);
+        model.addAttribute("invoice", response);
+        return "ConfirmInvoiceView";
+    }
+
+    @GetMapping("/update/{partnerId}")
+    public String showUpdateInvoice(@PathVariable int partnerId, Model model) {
+        // Load data if needed
+        model.addAttribute("partnerId", partnerId);
+        model.addAttribute("invoiceRequest", new InvoiceRequest());
+        return "UpdateInvoiceView";
     }
 
     @PostMapping("/update/{partnerId}")
-    public ApiResponse<InvoiceResponse> updateInvoice(@PathVariable int partnerId, @RequestBody InvoiceRequest invoiceRequest) {
-        return new ApiResponse<InvoiceResponse>(true, invoiceService.updateInvoice(partnerId, invoiceRequest));
+    public String updateInvoice(@PathVariable int partnerId, @ModelAttribute InvoiceRequest invoiceRequest, Model model) {
+        InvoiceResponse response = invoiceService.updateInvoice(partnerId, invoiceRequest);
+        model.addAttribute("invoice", response);
+        return "redirect:/invoice/get/" + response.getId(); // Assuming id in response
+    }
+
+    @GetMapping("/add/{shiftId}")
+    @PreAuthorize("hasAuthority('ACCOUNTANT')")
+    public String showCreateInvoice(@PathVariable int shiftId, Model model) {
+        model.addAttribute("shiftId", shiftId);
+        return "UpdateInvoiceView"; // Reuse or specific view
     }
 
     @PostMapping("/add/{shiftId}")
     @PreAuthorize("hasAuthority('ACCOUNTANT')")
-    public ApiResponse<InvoiceResponse> createInvoice(@PathVariable int shiftId) {
-        return new ApiResponse<InvoiceResponse>(true, invoiceService.createInvoice(shiftId));
+    public String createInvoice(@PathVariable int shiftId, Model model) {
+        InvoiceResponse response = invoiceService.createInvoice(shiftId);
+        model.addAttribute("invoice", response);
+        return "ConfirmInvoiceView";
     }
 }

@@ -1,14 +1,15 @@
 package com.vdtry06.partner_management.source.server.controllers;
 
-import com.vdtry06.partner_management.lib.api.ApiResponse;
 import com.vdtry06.partner_management.lib.api.PaginationResponse;
 import com.vdtry06.partner_management.lib.utils.PagingUtil;
 import com.vdtry06.partner_management.source.server.payload.contract.ContractResponse;
 import com.vdtry06.partner_management.source.server.service.ContractService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@Controller
 @RequestMapping("/contract")
 public class ContractController {
     private final ContractService contractService;
@@ -17,38 +18,69 @@ public class ContractController {
         this.contractService = contractService;
     }
 
-    @GetMapping("get-contract-id-of-partner/{contractId}/{partnerId}")
-    public ApiResponse<ContractResponse> getContractByPartnerIdAndContractId(
+    @GetMapping
+    public String showSearchPartnerView() {
+        return "PartnerManagementView";
+    }
+
+    @GetMapping("/get-contract-id-of-partner/{contractId}/{partnerId}")
+    public String getContractByPartnerIdAndContractId(
             @PathVariable int partnerId,
-            @PathVariable int contractId
+            @PathVariable int contractId,
+            Model model
     ) {
-        return new ApiResponse<>(true, contractService.getContractByPartnerIdAndContractId(partnerId, contractId));
+        ContractResponse response = contractService.getContractByPartnerIdAndContractId(partnerId, contractId);
+        model.addAttribute("contract", response);
+        return "DetailContractView"; // Adjust view as needed
     }
 
     @GetMapping("/get-all-contracts-of-partner/{partnerId}")
-    public PaginationResponse<ContractResponse> getAllContractsByPartnerId(
-            @RequestParam(required = false, defaultValue = PagingUtil.DEFAULT_PAGE) int page,
-            @RequestParam(required = false, defaultValue = PagingUtil.DEFAULT_SIZE) int perPage,
-            @PathVariable int partnerId
+    public String getAllContractsByPartnerId(
+            @RequestParam(defaultValue = PagingUtil.DEFAULT_PAGE) int page,
+            @RequestParam(defaultValue = PagingUtil.DEFAULT_SIZE) int perPage,
+            @PathVariable int partnerId,
+            Model model
     ) {
-        return contractService.getAllContractsByPartnerId(page, perPage, partnerId);
+        PaginationResponse<ContractResponse> pagination = contractService.getAllContractsByPartnerId(page, perPage, partnerId);
+        model.addAttribute("contracts", pagination.getData());
+        return "ListContractView";
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<ContractResponse> getContractById(@PathVariable int id) {
-        return new ApiResponse<>(true, contractService.getContractById(id));
+    public String getContractById(@PathVariable int id, Model model) {
+        ContractResponse response = contractService.getContractById(id);
+        model.addAttribute("contract", response);
+        return "DetailContractView";
+    }
+
+    @GetMapping("/add/{partnerId}")
+    @PreAuthorize("hasAuthority('PARTNER_MANAGER')")
+    public String showCreateContract(@PathVariable int partnerId, Model model) {
+        model.addAttribute("partnerId", partnerId);
+        return "ConfirmContractView"; // Or a form view if needed
     }
 
     @PostMapping("/add/{partnerId}")
     @PreAuthorize("hasAuthority('PARTNER_MANAGER')")
-    public ApiResponse<ContractResponse> createContract(@PathVariable int partnerId) {
-        return new ApiResponse<>(true, contractService.createContract(partnerId));
+    public String createContract(@PathVariable int partnerId, Model model) {
+        ContractResponse response = contractService.createContract(partnerId);
+        model.addAttribute("contract", response);
+        return "redirect:/list-task"; // Redirect to next step
+    }
+
+    @GetMapping("/update/{contractId}")
+    @PreAuthorize("hasAuthority('PARTNER_MANAGER')")
+    public String showUpdateContract(@PathVariable int contractId, Model model) {
+        ContractResponse response = contractService.getContractById(contractId);
+        model.addAttribute("contract", response);
+        return "ConfirmContractView";
     }
 
     @PostMapping("/update/{contractId}")
     @PreAuthorize("hasAuthority('PARTNER_MANAGER')")
-    public ApiResponse<ContractResponse> updateContract(@PathVariable int contractId) {
-        return new ApiResponse<>(true, contractService.updateContract(contractId));
+    public String updateContract(@PathVariable int contractId, Model model) {
+        ContractResponse response = contractService.updateContract(contractId);
+        model.addAttribute("contract", response);
+        return "ConfirmContractView";
     }
-
 }
