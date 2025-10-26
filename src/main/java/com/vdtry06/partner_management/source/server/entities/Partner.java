@@ -1,14 +1,21 @@
 package com.vdtry06.partner_management.source.server.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Table(name = "tblPartner", schema = "public")
 @Builder
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Partner implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,108 +41,12 @@ public class Partner implements Serializable {
     private String taxCode;
 
     @Column(name = "connperation_date")
-    private Date connperationDate;
+    private LocalDate connperationDate;
 
-    @Column(name = "description", length = 255)
+    @Column(name = "description", length = 255, nullable = true)
     private String description;
 
     @ManyToOne
     @JoinColumn(name = "partner_manager_id")
     private PartnerManager partnerManagerId;
-
-
-    public Partner() {}
-
-    public Partner(Integer id, String namePartner, String partnerRepresentative, String phoneNumber, String email, String address, String taxCode, Date connperationDate, String description, PartnerManager partnerManagerId) {
-        this.id = id;
-        this.namePartner = namePartner;
-        this.partnerRepresentative = partnerRepresentative;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.address = address;
-        this.taxCode = taxCode;
-        this.connperationDate = connperationDate;
-        this.description = description;
-        this.partnerManagerId = partnerManagerId;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNamePartner() {
-        return namePartner;
-    }
-
-    public void setNamePartner(String namePartnerPartner) {
-        this.namePartner = namePartner;
-    }
-
-    public String getPartnerRepresentative() {
-        return partnerRepresentative;
-    }
-
-    public void setPartnerRepresentative(String partnerRepresentative) {
-        this.partnerRepresentative = partnerRepresentative;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getTaxCode() {
-        return taxCode;
-    }
-
-    public void setTaxCode(String taxCode) {
-        this.taxCode = taxCode;
-    }
-
-    public Date getConnperationDate() {
-        return connperationDate;
-    }
-
-    public void setConnperationDate(Date connperationDate) {
-        this.connperationDate = connperationDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public PartnerManager getPartnerManagerId() {
-        return partnerManagerId;
-    }
-
-    public void setPartnerManagerId(PartnerManager partnerManagerId) {
-        this.partnerManagerId = partnerManagerId;
-    }
 }
