@@ -20,6 +20,16 @@ public class PartnerService {
     private final PartnerRepository partnerRepository;
     private final PartnerManagerRepository partnerManagerRepository;
 
+    public List<PartnerResponse> searchPartnersByKeyword(String keyword, Integer managerId) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getPartnersByManagerIdResponse(managerId);
+        }
+
+        return partnerRepository.searchByKeywordAndManagerId(keyword.trim(), managerId).stream()
+                .map(PartnerResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     public List<PartnerResponse> getAllPartnersResponse() {
         return partnerRepository.findAll().stream()
                 .map(PartnerResponse::fromEntity)

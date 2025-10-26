@@ -190,7 +190,7 @@
                 <p>Xem, thêm, sửa và quản lý thông tin các đối tác của công ty</p>
             </a>
 
-            <a href="#" class="dashboard-card">
+            <a href="${pageContext.request.contextPath}/partner-manager/contracts/search-partner" class="dashboard-card">
                 <div class="card-icon contracts">📄</div>
                 <h3>Ký Hợp đồng</h3>
                 <p>Theo dõi và quản lý các hợp đồng với đối tác</p>
