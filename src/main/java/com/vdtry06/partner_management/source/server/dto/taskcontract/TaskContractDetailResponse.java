@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TaskContractDetailResponse {
     private Integer id;
+    private Integer taskId;
     private String taskName;
     private String taskDescription;
     private Long taskUnitPrice;
@@ -24,6 +25,7 @@ public class TaskContractDetailResponse {
     public static TaskContractDetailResponse fromTaskContractResponse(TaskContractResponse tcr) {
         return TaskContractDetailResponse.builder()
                 .id(tcr.getId())
+                .taskId(tcr.getTaskId())
                 .taskName(tcr.getTaskName())
                 .taskDescription(tcr.getTaskDescription())
                 .taskUnitPrice(tcr.getTaskUnitPrice())

@@ -111,6 +111,9 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.08);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
 
         .dashboard-card:hover {
@@ -129,20 +132,8 @@
             margin-bottom: 20px;
         }
 
-        .card-icon.invoices {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        }
-
-        .card-icon.shifts {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        }
-
         .card-icon.payments {
             background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-        }
-
-        .card-icon.reports {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
         }
 
         .dashboard-card h3 {
@@ -155,6 +146,18 @@
             color: #666;
             font-size: 14px;
             line-height: 1.6;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
     </style>
 </head>
@@ -175,35 +178,21 @@
     </nav>
 
     <div class="container">
+        <c:if test="${success != null}">
+            <div class="alert alert-success">✅ ${success}</div>
+        </c:if>
+
         <div class="welcome-card">
             <h1>Xin chào, ${fullname}!</h1>
             <p>Chào mừng bạn đến với hệ thống kế toán. Bạn có thể quản lý hóa đơn, thanh toán và theo dõi các ca làm việc từ đây.</p>
         </div>
 
         <div class="dashboard-grid">
-            <!-- <div class="dashboard-card">
-                <div class="card-icon invoices">🧾</div>
-                <h3>Quản lý Hóa đơn</h3>
-                <p>Xem, tạo và quản lý các hóa đơn thanh toán</p>
-            </div> -->
-
-            <!-- <div class="dashboard-card">
-                <div class="card-icon shifts">⏰</div>
-                <h3>Quản lý Ca làm</h3>
-                <p>Theo dõi và xác nhận các ca làm việc của đối tác</p>
-            </div> -->
-
-            <div class="dashboard-card">
+            <a href="${pageContext.request.contextPath}/accountant/search-partner" class="dashboard-card">
                 <div class="card-icon payments">💰</div>
                 <h3>Nhận Thanh toán</h3>
-                <p>Xử lý và theo dõi các khoản thanh toán</p>
-            </div>
-
-            <!-- <div class="dashboard-card">
-                <div class="card-icon reports">📈</div>
-                <h3>Báo cáo Tài chính</h3>
-                <p>Xem báo cáo và thống kê tài chính</p>
-            </div> -->
+                <p>Xử lý và theo dõi các khoản thanh toán từ đối tác</p>
+            </a>
         </div>
     </div>
 </body>

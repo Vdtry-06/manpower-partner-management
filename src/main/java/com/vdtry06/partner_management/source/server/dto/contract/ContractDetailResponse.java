@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 @Builder
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ContractDetailResponse {
     private Integer id;
+    private Integer taskId;
     private String contractName;
     private String description;
     private String startDate;
@@ -34,12 +36,19 @@ public class ContractDetailResponse {
     // Thông tin nhân viên quản lý
     private String managerName;
     private String managerPosition;
+    private boolean hasShifts;
 
     // Danh sách task contracts với shifts
     private List<TaskContractDetailResponse> taskContracts;
 
     public static ContractDetailResponse fromEntity(Contract contract, TaskContractService taskContractService) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+        boolean hasShifts = taskContractService.getTaskContractsByContractId(contract.getId())
+                .stream()
+                .flatMap(tc -> tc.getShifts() == null ? Stream.empty() : tc.getShifts().stream())
+                .findAny()
+                .isPresent();
 
         return ContractDetailResponse.builder()
                 .id(contract.getId())
@@ -59,6 +68,7 @@ public class ContractDetailResponse {
                         .stream()
                         .map(tc -> TaskContractDetailResponse.fromTaskContractResponse(tc))
                         .collect(Collectors.toList()))
+                .hasShifts(hasShifts)
                 .build();
     }
 }
