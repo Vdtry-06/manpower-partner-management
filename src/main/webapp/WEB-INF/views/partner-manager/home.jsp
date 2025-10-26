@@ -111,6 +111,9 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.08);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
 
         .dashboard-card:hover {
@@ -181,29 +184,29 @@
         </div>
 
         <div class="dashboard-grid">
-            <div class="dashboard-card">
+            <a href="${pageContext.request.contextPath}/partner-manager/partners" class="dashboard-card">
                 <div class="card-icon partners">👥</div>
                 <h3>Quản lý Đối tác</h3>
                 <p>Xem, thêm, sửa và quản lý thông tin các đối tác của công ty</p>
-            </div>
+            </a>
 
-            <div class="dashboard-card">
+            <a href="#" class="dashboard-card">
                 <div class="card-icon contracts">📄</div>
-                <h3>Quản lý Hợp đồng</h3>
+                <h3>Ký Hợp đồng</h3>
                 <p>Theo dõi và quản lý các hợp đồng với đối tác</p>
-            </div>
+            </a>
 
-            <div class="dashboard-card">
+            <!-- <a href="#" class="dashboard-card">
                 <div class="card-icon tasks">✅</div>
                 <h3>Quản lý Công việc</h3>
                 <p>Phân công và theo dõi tiến độ các công việc</p>
-            </div>
+            </a> -->
 
-            <div class="dashboard-card">
+            <!-- <a href="#" class="dashboard-card">
                 <div class="card-icon reports">📊</div>
                 <h3>Báo cáo</h3>
                 <p>Xem báo cáo thống kê và phân tích dữ liệu</p>
-            </div>
+            </a> -->
         </div>
     </div>
 </body>

@@ -181,29 +181,29 @@
         </div>
 
         <div class="dashboard-grid">
-            <div class="dashboard-card">
+            <!-- <div class="dashboard-card">
                 <div class="card-icon invoices">🧾</div>
                 <h3>Quản lý Hóa đơn</h3>
                 <p>Xem, tạo và quản lý các hóa đơn thanh toán</p>
-            </div>
+            </div> -->
 
-            <div class="dashboard-card">
+            <!-- <div class="dashboard-card">
                 <div class="card-icon shifts">⏰</div>
                 <h3>Quản lý Ca làm</h3>
                 <p>Theo dõi và xác nhận các ca làm việc của đối tác</p>
-            </div>
+            </div> -->
 
             <div class="dashboard-card">
                 <div class="card-icon payments">💰</div>
-                <h3>Thanh toán</h3>
+                <h3>Nhận Thanh toán</h3>
                 <p>Xử lý và theo dõi các khoản thanh toán</p>
             </div>
 
-            <div class="dashboard-card">
+            <!-- <div class="dashboard-card">
                 <div class="card-icon reports">📈</div>
                 <h3>Báo cáo Tài chính</h3>
                 <p>Xem báo cáo và thống kê tài chính</p>
-            </div>
+            </div> -->
         </div>
     </div>
 </body>
