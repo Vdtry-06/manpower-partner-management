@@ -1,6 +1,6 @@
 package com.vdtry06.partner_management.lib.enumerated;
 
-public enum EmployeePostion {
+public enum EmployeePosition {
     ACCOUNTANT,
     PARTNER_MANAGER,
     ADMIN,

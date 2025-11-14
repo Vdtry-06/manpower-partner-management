@@ -1,0 +1,12 @@
+app:
+  urls:
+    login: /auth/login
+    logout: /auth/login?logout=true
+    home:
+      partner-manager: /partner-manager/home
+      accountant: /accountant/home
+      admin: /admin/home
+    management:
+      partner: /partner-manager/partner-management
+    create:
+      partner-manager: /partner-manager/add-partner

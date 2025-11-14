@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Manager Home</title>
+    <link rel="stylesheet" th:href="@{/partner-manager/home.css}">
+</head>
+<body>
+<nav class="navbar">
+    <div class="navbar-brand">
+        Partner Management
+    </div>
+    <div class="navbar-user">
+        <div class="user-info">
+            <div class="user-name" th:text="${username}"></div>
+            <div class="user-role">Partner Manager</div>
+        </div>
+        <a th:href="@{/auth/logout}" class="btn-logout">
+            Logout
+        </a>
+    </div>
+</nav>
+<div class="container">
+    <div class="welcome-card">
+        <h1 th:text="'Xin chào, ' + ${fullname} + '!'"></h1>
+        <p>Chào mừng bạn đến với hệ thống quản lý đối tác. Bạn có thể quản lý đối tác, hợp đồng và theo dõi các công việc từ đây.</p>
+    </div>
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+    <div class="dashboard-grid">
+        <a th:href="@{/partner-manager/partner-management}" class="dashboard-card">
+            <h3>Quản lý Đối tác</h3>
+            <p>quản lý thông tin các đối tác của công ty</p>
+        </a>
+
+        <a th:href="@{/partner-manager/contracts/search-partner}" class="dashboard-card">
+            <h3>Ký Hợp đồng</h3>
+            <p>Theo dõi và quản lý các hợp đồng với đối tác</p>
+        </a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 package com.vdtry06.partner_management.source.server.entities;
 
-import com.vdtry06.partner_management.lib.enumerated.EmployeePostion;
+import com.vdtry06.partner_management.lib.enumerated.EmployeePosition;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,7 +29,7 @@ public class Employee implements Serializable {
 
     @Column(name = "position")
     @Enumerated(EnumType.STRING)
-    private EmployeePostion position;
+    private EmployeePosition position;
 
     @Column(name = "phone_number", length = 10)
     private String phoneNumber;

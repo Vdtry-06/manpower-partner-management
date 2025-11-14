@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Đối tác</title>
+    <link rel="stylesheet" th:href="@{/partner-manager/partner-management.css}">
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="navbar-brand">
+        Partner Management
+    </div>
+    <div class="navbar-user">
+        <div class="user-info">
+            <div class="user-name" th:text="${username}"></div>
+            <div class="user-role">Partner Manager</div>
+        </div>
+        <a th:href="@{/auth/logout}" class="btn-logout">
+            Logout
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Quản lý thông tin đối tác</h1>
+
+        <div class="action-buttons">
+            <a th:href="@{/partner-manager/partner/add}" class="btn btn-primary">
+                Thêm đối tác
+            </a>
+
+            <a th:href="@{/partner-manager/home}" class="btn btn-secondary">
+                Quay lại
+            </a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
