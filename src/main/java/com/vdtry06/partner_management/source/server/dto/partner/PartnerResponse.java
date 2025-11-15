@@ -11,4 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PartnerResponse {
     private Integer id;
+    private String namePartner;
+    private String partnerRepresentative;
+    private String phoneNumber;
+    private String email;
+    private String address;
+    private String taxCode;
+    private String connperationDate;
+    private String description;
 }

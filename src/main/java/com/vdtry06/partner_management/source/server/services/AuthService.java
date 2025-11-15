@@ -45,7 +45,7 @@ public class AuthService {
                 .build();
     }
 
-    public boolean checkAuth(HttpSession session, EmployeePosition requiredPosition) {
+    public boolean checkAuthentication(HttpSession session, EmployeePosition requiredPosition) {
         if (session.getAttribute("employeeId") == null) return false;
         EmployeePosition position = (EmployeePosition) session.getAttribute("position");
         return position == requiredPosition;

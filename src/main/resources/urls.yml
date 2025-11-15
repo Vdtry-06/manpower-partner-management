@@ -9,4 +9,6 @@ app:
     management:
       partner: /partner-manager/partner-management
     create:
-      partner-manager: /partner-manager/add-partner
+      create-partner: /partner-manager/add-partner
+    search:
+      search-partner: /partner-manager/search-partner

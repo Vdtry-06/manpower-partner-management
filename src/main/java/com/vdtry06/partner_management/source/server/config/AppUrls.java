@@ -17,4 +17,5 @@ public class AppUrls {
     private Map<String, String> home;
     private Map<String, String> create;
     private Map<String, String> management;
+    private Map<String, String> search;
 }
