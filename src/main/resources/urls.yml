@@ -10,5 +10,23 @@ app:
       partner: /partner-manager/partner-management
     create:
       create-partner: /partner-manager/add-partner
+      create-shift: /partner-manager/add-shift
+      create-task: /partner-manager/add-task
+    update:
+      update-invoice: /accountant/detail-contract
     search:
-      search-partner: /partner-manager/search-partner
+      partner-manager: /partner-manager/search-partner
+      accountant: /accountant/search-partner
+    select:
+      select-partner: /partner-manager/contract/tasks
+      select-task: /partner-manager/contract/task-contract/
+      select-shift-task-contract: /shift-task-contract/
+      select-contract: /accountant/detail-contract
+    list:
+      list-task: /partner-manager/list-tasks
+      list-contract: /accountant/list-contract
+    cancel:
+      contract: /partner-manager/contract/cancel
+    confirm:
+      confirm-contract: /partner-manager/confirm-contract
+      contract: /partner-manager/contract/confirm
