@@ -18,4 +18,8 @@ public class AppUrls {
     private Map<String, String> create;
     private Map<String, String> management;
     private Map<String, String> search;
+    private Map<String, String> select;
+    private Map<String, String> list;
+    private Map<String, String> update;
+    private Map<String, String> confirm;
 }
