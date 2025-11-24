@@ -1,0 +1,230 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+}
+
+.navbar {
+    background: #4a67e6;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-info {
+    text-align: right;
+}
+
+.user-name {
+    font-weight: bold;
+}
+
+.user-role {
+    font-size: 12px;
+}
+
+.btn-logout {
+    background: white;
+    color: #4a67e6;
+    padding: 5px 12px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.btn-logout:hover {
+    background: #e1e1e1;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 10px;
+}
+
+.page-header {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.page-header h1 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.alert-danger {
+    background: #fdf0f0;
+    color: #a33;
+    padding: 10px;
+    border: 1px solid #f3c5c5;
+    margin-bottom: 20px;
+}
+
+.contract-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.contract-title {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3b5bd8;
+}
+
+.contract-title h2 {
+    font-size: 22px;
+}
+
+.info-section h3 {
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.info-item {
+    background: #fafafa;
+    padding: 12px;
+    border: 1px solid #eee;
+}
+
+.info-item label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 3px;
+    display: block;
+}
+
+.info-item .value {
+    font-size: 14px;
+    color: #333;
+}
+
+.task-block {
+    background: #fafafa;
+    padding: 15px;
+    border-left: 3px solid #3b5bd8;
+    margin-bottom: 20px;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.shift-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.shift-table th,
+.shift-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.shift-table thead {
+    background: #CBCBCB;
+    color: white;
+}
+
+.summary-box {
+    background: #4a67e6;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    margin-top: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.summary-box .total-value {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #eee;
+}
+
+.btn {
+    padding: 12px 25px;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-success {
+    text-decoration: none;
+    background: #28a745;
+    color: white;
+}
+
+.btn-warning {
+    background: #e83c91;
+    text-decoration: none;
+    color: white;
+}
+
+.btn-secondary {
+    background: #ddd;
+    text-decoration: none;
+    color: black;
+}
+
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}

@@ -3,28 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partner Manager Home</title>
+    <title>Trang chủ nhân viên quản lý đối tác</title>
     <link rel="stylesheet" th:href="@{/partner-manager/home.css}">
 </head>
 <body>
 <nav class="navbar">
     <div class="navbar-brand">
-        Partner Management
+        Hệ thống cung cấp nhân công
     </div>
     <div class="navbar-user">
         <div class="user-info">
             <div class="user-name" th:text="${username}"></div>
-            <div class="user-role">Partner Manager</div>
+            <div class="user-role">Nhân viên quản lý đối tác</div>
         </div>
         <a th:href="@{/auth/logout}" class="btn-logout">
-            Logout
+            Đăng xuất
         </a>
     </div>
 </nav>
 <div class="container">
     <div class="welcome-card">
         <h1 th:text="'Xin chào, ' + ${fullname} + '!'"></h1>
-        <p>Chào mừng bạn đến với hệ thống quản lý đối tác. Bạn có thể quản lý đối tác, hợp đồng và theo dõi các công việc từ đây.</p>
+        <p>Trang chủ của nhân viên quản lý đối tác</p>
     </div>
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
 

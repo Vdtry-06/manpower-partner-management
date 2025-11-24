@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Đầu việc Mới</title>
+    <link rel="stylesheet" th:href="@{/partner-manager/add-task.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-brand">Hệ thống cung cấp nhân công</div>
+    <div class="navbar-user">
+        <div class="user-info">
+            <div class="user-name" th:text="${username}"></div>
+            <div class="user-role">Nhân viên quản lý đối tác</div>
+        </div>
+        <a th:href="@{/auth/logout}" class="btn-logout"> Đăng xuất </a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Thêm đầu việc mới</h1>
+    </div>
+
+    <div class="form-card">
+
+        <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/partner-manager/task/add}"
+              th:object="${taskRequest}"
+              method="post">
+
+            <div class="form-group">
+                <label for="nameTask">Tên đầu việc <span class="required">*</span></label>
+                <input th:field="*{nameTask}"
+                       id="nameTask"
+                       placeholder="Ví dụ: Xây dựng, Bảo vệ, Vệ sinh..."
+                       th:classappend="${#fields.hasErrors('nameTask')} ? ' error-input' : ''"/>
+                <div class="error" th:errors="*{nameTask}"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Mô tả</label>
+                <textarea th:field="*{description}"
+                          id="description"
+                          placeholder="Nhập mô tả chi tiết về đầu việc này..."></textarea>
+                <div class="error" th:errors="*{description}"></div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Lưu đầu việc</button>
+
+                <a th:href="@{/partner-manager/contract/tasks}"
+                   class="btn btn-secondary">
+                    Hủy bỏ
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

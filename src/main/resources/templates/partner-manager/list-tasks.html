@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chọn Đầu việc</title>
+    <link rel="stylesheet" th:href="@{/partner-manager/list-tasks.css}" />
+</head>
+
+<body>
+    <nav class="navbar">
+      <div class="navbar-brand">Hệ thống cung cấp nhân công</div>
+      <div class="navbar-user">
+        <div class="user-info">
+          <div class="user-name" th:text="${username}"></div>
+          <div class="user-role">Nhân viên quản lý đối tác</div>
+        </div>
+        <a th:href="@{/auth/logout}" class="btn-logout"> Đăng xuất </a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="page-header">
+        <h1>Chọn đầu việc cho hợp đồng</h1>
+        <p>Chọn các đầu việc mà đối tác cần thực hiện</p>
+      </div>
+
+      <div
+        class="alert alert-success"
+        th:if="${successMessage}"
+        th:text="${successMessage}"
+      ></div>
+
+      <div
+        class="alert alert-danger"
+        th:if="${errorMessage}"
+        th:text="${errorMessage}"
+      ></div>
+
+      <div class="content-card">
+        <!-- Hiển thị danh sách đầu việc đã chọn -->
+        <div
+          th:if="${selectedTaskContracts != null and !selectedTaskContracts.isEmpty()}"
+          class="selected-tasks-info"
+        >
+          <h3>
+            Đầu việc đã thêm vào hợp đồng (<span
+              th:text="${#lists.size(selectedTaskContracts)}"
+            ></span
+            >)
+          </h3>
+          <ul>
+            <li
+              th:each="taskContract : ${selectedTaskContracts}"
+              th:text="${taskContract.taskName}"
+            ></li>
+          </ul>
+        </div>
+
+        <h2 class="section-title">Danh sách đầu việc có sẵn</h2>
+
+        <div th:if="${#lists.isEmpty(tasks)}" class="no-data">
+          <p>Chưa có đầu việc nào trong hệ thống</p>
+          <p style="margin-top: 10px">
+            Nhấn "Thêm đầu việc mới" để tạo đầu việc
+          </p>
+        </div>
+
+        <table class="task-table" th:if="${not #lists.isEmpty(tasks)}">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Tên đầu việc</th>
+              <th>Mô tả</th>
+              <th style="text-align: center">Hành động</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr th:each="task, status : ${tasks}">
+              <td th:text="${status.index + 1}"></td>
+              <td th:text="${task.nameTask}"></td>
+              <td
+                th:text="${task.description != null ? task.description : 'Không có mô tả'}"
+              ></td>
+              <td style="text-align: center">
+                <a
+                  th:if="${selectedTaskContractMap != null and selectedTaskContractMap.containsKey(task.id)}"
+                  th:href="@{'/partner-manager/contract/task-contract/' + ${selectedTaskContractMap[task.id]} + '/shift-task-contract/' + ${selectedShiftTaskContractMap[task.id]} + '/add-shift'}"
+                  class="btn btn-primary small-btn"
+                  >Cập nhật</a
+                >
+
+                <form
+                  th:if="${selectedTaskContractMap == null or !selectedTaskContractMap.containsKey(task.id)}"
+                  th:action="@{'/partner-manager/contract/task/select/' + ${task.id}}"
+                  method="post"
+                  style="display: inline"
+                >
+                  <button type="submit" class="btn btn-primary small-btn">
+                    Chọn
+                  </button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="action-buttons">
+          <a
+            th:href="@{/partner-manager/task/add}"
+            class="btn btn-success"
+          >
+            Thêm đầu việc mới
+          </a>
+
+          <a
+            th:if="${selectedTaskContracts != null and !selectedTaskContracts.isEmpty()}"
+            th:href="@{/partner-manager/contract/confirm}"
+            class="btn btn-warning"
+          >
+            Xem & Xác nhận hợp đồng
+          </a>
+
+          <a
+            th:href="@{/partner-manager/contract/cancel}"
+            onclick="return confirm('Bạn có chắc muốn hủy hợp đồng này? Tất cả dữ liệu sẽ bị xóa vĩnh viễn.')"
+            class="btn btn-secondary"
+          >
+            Hủy hợp đồng
+          </a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

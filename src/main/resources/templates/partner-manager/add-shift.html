@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Ca Làm Việc</title>
+    <link rel="stylesheet" th:href="@{/partner-manager/add-shift.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-brand">
+        Hệ thống cung cấp nhân công
+    </div>
+    <div class="navbar-user">
+        <div class="user-info">
+            <div class="user-name" th:text="${username}"></div>
+            <div class="user-role">Nhân viên quản lý đối tác</div>
+        </div>
+        <a th:href="@{/auth/logout}" class="btn-logout">
+            Đăng xuất
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Thêm Ca Làm Việc</h1>
+        <p>Đầu việc: <strong th:text="${taskName}"></strong></p>
+    </div>
+
+    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <div class="content-wrapper">
+        <div class="form-card">
+            <h2 class="section-title">Thông tin ca làm việc</h2>
+
+            <form th:action="@{'/partner-manager/contract/task-contract/' + ${taskContractId} + '/shift-task-contract/' + ${shiftTaskContractId} + '/add-shift'}"
+                  th:object="${shiftRequest}"
+                  method="post">
+
+                <div class="form-group">
+                    <label for="workDate">Ngày làm việc <span class="required">*</span></label>
+                    <input type="date"
+                           id="workDate"
+                           th:field="*{workDate}"
+                           required>
+                    <div class="error-message" th:if="${#fields.hasErrors('workDate')}" th:errors="*{workDate}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="shiftType">Ca làm việc <span class="required">*</span></label>
+                    <select id="shiftType" th:field="*{shiftType}" required>
+                        <option value="">-- Chọn ca làm việc --</option>
+                        <option th:each="type : ${shiftTypes}"
+                                th:if="${type != null and !type.equals(T(com.vdtry06.partner_management.lib.enumerated.ShiftType).DEFAULT)}"
+                                th:value="${type}"
+                                th:text="${type.name() + ' (' + type.timeRange() + ')'}">
+                        </option>
+                    </select>
+                    <div class="error-message" th:if="${#fields.hasErrors('shiftType')}" th:errors="*{shiftType}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="workerCount">Số lượng nhân công <span class="required">*</span></label>
+                    <input type="number"
+                           id="workerCount"
+                           th:field="*{workerCount}"
+                           min="1"
+                           placeholder="Nhập số lượng nhân công"
+                           required>
+                    <div class="error-message" th:if="${#fields.hasErrors('workerCount')}" th:errors="*{workerCount}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="shiftUnitPrice">Đơn giá ca làm (VNĐ) <span class="required">*</span></label>
+                    <input type="number"
+                           id="shiftUnitPrice"
+                           th:field="*{shiftUnitPrice}"
+                           min="0"
+                           placeholder="Nhập đơn giá"
+                           required>
+                    <div class="error-message" th:if="${#fields.hasErrors('shiftUnitPrice')}" th:errors="*{shiftUnitPrice}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Mô tả (Tùy chọn)</label>
+                    <textarea id="description"
+                              th:field="*{description}"
+                              placeholder="Nhập mô tả cho ca làm việc..."></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Lưu ca làm việc</button>
+                    <a th:href="@{'/partner-manager/contract/task-contract/' + ${taskContractId} + '/complete'}"
+                       class="btn btn-success">Hoàn thành đầu việc</a>
+                    <a th:href="@{'/partner-manager/contract/task-contract/' + ${taskContractId} + '/cancel'}"
+                       class="btn btn-secondary"
+                       onclick="return confirm('Bạn có chắc muốn hủy đầu việc này? Tất cả ca làm việc đã thêm sẽ bị xóa.')">Hủy bỏ</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="list-card">
+            <h2 class="section-title">Danh sách ca làm việc đã thêm</h2>
+
+            <div th:if="${#lists.isEmpty(shifts)}" class="no-data">
+                <p>Chưa có ca làm việc nào</p>
+                <p style="margin-top: 10px;">Thêm ca làm việc đầu tiên cho đầu việc này</p>
+            </div>
+
+            <table class="shifts-table" th:if="${not #lists.isEmpty(shifts)}">
+                <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Ngày</th>
+                    <th>Ca</th>
+                    <th>Số công</th>
+                    <th>Đơn giá</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="shift, status : ${shifts}">
+                    <td th:text="${status.index + 1}"></td>
+                    <td th:text="${shift.workDate}"></td>
+                    <td th:text="${shift.shiftType.timeRange()}"></td>
+                    <td th:text="${shift.workerCount}"></td>
+                    <td th:text="${shift.shiftUnitPrice + ' VNĐ'}"></td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận Hợp đồng</title>
+    <link rel="stylesheet" th:href="@{/partner-manager/confirm-contract.css}">
+</head>
+<body>
+<nav class="navbar">
+    <div class="navbar-brand">
+        Hệ thống cung cấp nhân công
+    </div>
+    <div class="navbar-user">
+        <div class="user-info">
+            <div class="user-name" th:text="${username}"></div>
+            <div class="user-role">Nhân viên quản lý đối tác</div>
+        </div>
+        <a th:href="@{/auth/logout}" class="btn-logout">
+            Đăng xuất
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Xác nhận Hợp đồng</h1>
+        <p>Kiểm tra kỹ thông tin trước khi lưu hợp đồng</p>
+    </div>
+
+    <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <div class="contract-card">
+        <div class="contract-title">
+            <h2 th:text="${contractDetail.contractName}"></h2>
+            <p><strong>Mô tả:</strong> <span th:text="${contractDetail.description != null ? contractDetail.description : 'Không có mô tả'}"></span></p>
+        </div>
+
+        <div class="info-section">
+            <h3>Thông tin đối tác</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Tên đối tác</label>
+                    <div class="value" th:text="${contractDetail.partnerName}"></div>
+                </div>
+                <div class="info-item">
+                    <label>Người đại diện</label>
+                    <div class="value" th:text="${contractDetail.partnerRepresentative}"></div>
+                </div>
+                <div class="info-item">
+                    <label>Số điện thoại</label>
+                    <div class="value" th:text="${contractDetail.partnerPhone}"></div>
+                </div>
+                <div class="info-item">
+                    <label>Email</label>
+                    <div class="value" th:text="${contractDetail.partnerEmail}"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>Thông tin nhân viên đại diện công ty</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Họ và tên</label>
+                    <div class="value" th:text="${contractDetail.managerName}"></div>
+                </div>
+                <div class="info-item">
+                    <label>Chức vụ</label>
+                    <div class="value" th:text="${contractDetail.managerPosition}"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tasks-section">
+            <h3 style="color: #667eea; font-size: 22px; margin-bottom: 15px; margin-top: 10px;">Danh sách đầu việc & Ca làm việc</h3>
+
+            <div th:each="tc, taskStatus : ${contractDetail.taskContracts}" class="task-block">
+                <div class="task-header">
+                    <h4><span th:text="${tc.taskName}"></span></h4>
+                    <span class="task-total">
+                            Tổng: <span th:text="${tc.totalValue}"></span> VNĐ
+                    </span>
+                </div>
+
+                <p th:if="${tc.taskDescription != null and !tc.taskDescription.isEmpty()}"
+                   th:text="${tc.taskDescription}">
+                </p>
+
+                <table class="shift-table">
+                    <thead>
+                    <tr>
+                        <th>STT</th>
+<!--                        <th>Mã CLV</th>-->
+                        <th>Ngày làm</th>
+                        <th>Giờ bắt đầu</th>
+                        <th>Giờ kết thúc</th>
+                        <th>Số lượng NC</th>
+                        <th>Đơn giá (VNĐ)</th>
+                        <th>Thành tiền (VNĐ)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="shift, shiftStatus : ${tc.shifts}">
+                        <td th:text="${shiftStatus.index + 1}"></td>
+<!--                        <td>CLV<span th:text="${shift.id}"></span></td>-->
+                        <td th:text="${shift.workDate}"></td>
+                        <td th:text="${shift.startTime}"></td>
+                        <td th:text="${shift.endTime}"></td>
+                        <td th:text="${shift.workerCount}"></td>
+                        <td th:text="${shift.shiftUnitPrice}"></td>
+                        <td th:text="${shift.totalValue}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="summary-box">
+            <h3>TỔNG GIÁ TRỊ HỢP ĐỒNG</h3>
+            <div class="total-value">
+                <span th:text="${contractDetail.totalContractValue}"></span> VNĐ
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <form th:action="@{/partner-manager/contract/finalize}"
+                  method="post"
+                  onsubmit="return confirm('Bạn có chắc chắn muốn lưu hợp đồng này? Sau khi lưu sẽ không thể chỉnh sửa.')">
+                <button type="submit" class="btn btn-success">
+                    Lưu hợp đồng
+                </button>
+            </form>
+
+            <a th:href="@{/partner-manager/contract/tasks}"
+               class="btn btn-warning">
+                Sửa đổi
+            </a>
+
+            <a th:href="@{/partner-manager/contract/cancel}"
+               class="btn btn-secondary"
+               onclick="return confirm('Bạn có chắc muốn hủy hợp đồng này? Tất cả dữ liệu sẽ bị xóa.')">
+                Hủy hợp đồng
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

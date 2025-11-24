@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chi tiết hợp đồng</title>
+    <link rel="stylesheet" th:href="@{/accountant/detail-contract.css}" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-brand">Hệ thống cung cấp nhân công</div>
+
+      <div class="navbar-user">
+        <div class="user-info">
+          <div class="user-name" th:text="${username}"></div>
+          <div class="user-role">Nhân viên kế toán</div>
+        </div>
+
+        <a th:href="@{/auth/logout}" class="btn-logout">Đăng xuất</a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div
+        th:if="${success}"
+        class="alert alert-success"
+        th:text="${success}"
+      ></div>
+      <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+      <div class="card">
+        <h2 class="card-title">Chi tiết hợp đồng: [[${contract.contractName}]]</h2>
+
+        <div class="info-section">
+          <h3
+            th:text="'Thông tin đối tác: ' + ${contract.partnerName} + ' — ' + ${contract.partnerRepresentative}"
+          ></h3>
+          <p>
+            <strong>SĐT:</strong>
+            <span th:text="${contract.partnerPhone}"></span>
+          </p>
+          <p>
+            <strong>Email:</strong>
+            <span th:text="${contract.partnerEmail}"></span>
+          </p>
+        </div>
+
+        <div class="info-section">
+          <h3 th:text="'Hợp đồng: ' + ${contract.contractName}"></h3>
+          <p>
+            <strong>Mã hợp đồng:</strong>
+            <span th:text="'HĐ' + ${contract.contractId}"></span>
+          </p>
+          <p>
+            <strong>Ngày bắt đầu:</strong>
+            <span th:text="${contract.startDate}"></span>
+          </p>
+          <p>
+            <strong>Ngày kết thúc:</strong>
+            <span th:text="${contract.endDate}"></span>
+          </p>
+        </div>
+
+        <h3 style="color: #333; margin: 25px 0 15px 0">
+          Danh sách ca làm việc & đầu việc
+        </h3>
+
+        <form id="paymentForm" th:action="@{/accountant/create-invoice-preview}" method="post">
+          <input type="hidden" name="contractId" th:value="${contract.contractId}"/>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 60px; text-align: center">Chọn</th>
+                  <th style="width: 50px">STT</th>
+<!--                  <th style="width: 70px">Mã CLV</th>-->
+<!--                  <th style="width: 70px">Mã ĐV</th>-->
+                  <th>Tên đầu việc</th>
+                  <th style="width: 100px">Ngày làm</th>
+                  <th style="width: 70px">Giờ BĐ</th>
+                  <th style="width: 70px">Giờ KT</th>
+                  <th style="width: 70px">SL nhân công</th>
+                  <th style="width: 120px">Đơn giá (VNĐ)</th>
+                  <th style="width: 140px">Thành tiền (VNĐ)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <th:block th:each="taskContract : ${contract.taskContracts}">
+                  <th:block th:each="shift, shStat : ${taskContract.shifts}">
+                    <tr
+                      th:class="row-active"
+                    >
+                        <td class="checkbox-cell">
+                            <input
+                                    type="checkbox"
+                                    name="shiftIds"
+                                    th:value="${shift.id}"
+                                    class="shift-checkbox"
+                                    th:if="${shift.invoiceId == null}"
+                            />
+                            <span class="check-mark" th:if="${shift.invoiceId == null}"></span>
+                            <span th:if="${shift.invoiceId != null}" style="color: #999;">Đã thanh toán</span>
+
+                        </td>
+                        <td th:text="${shStat.index + 1}"></td>
+<!--                      <td th:text="'CLV' + ${shift.id}"></td>-->
+<!--                      <td th:text="'DV' + ${taskContract.taskId}"></td>-->
+                      <td>
+                        <strong th:text="${taskContract.taskName}"></strong>
+                      </td>
+                      <td th:text="${shift.workDate}"></td>
+                      <td th:text="${shift.startTime}"></td>
+                      <td th:text="${shift.endTime}"></td>
+                      <td th:text="${shift.workerCount}"></td>
+                      <td th:text="${shift.shiftUnitPrice}"></td>
+                      <td th:text="${shift.totalValue}"></td>
+                    </tr>
+                  </th:block>
+                </th:block>
+
+                <tr th:if="${#lists.isEmpty(contract.taskContracts)}">
+                  <td
+                    colspan="11"
+                    style="text-align: center; padding: 30px; color: #999"
+                  >
+                    Chưa có ca làm việc nào
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+              <div class="form-group">
+                  <label for="paymentMethod"><strong>Phương thức thanh toán:</strong></label>
+                  <select id="paymentMethod" name="paymentMethod" required>
+                      <option value="">-- Chọn --</option>
+                      <option value="CASH">Tiền mặt</option>
+                      <option value="TRANSFER">Chuyển khoản</option>
+                  </select>
+              </div>
+          </div>
+            <br>
+            <button type="submit" class="btn-payment">
+              xác nhận hóa đơn
+            </button>
+        </form>
+
+        <div class="total-section">
+          <h3>
+            Tổng giá trị hợp đồng:
+            <span th:text="${contract.totalContractValue} + ' VNĐ'"></span>
+          </h3>
+        </div>
+
+        <div style="margin-top: 25px">
+            <a th:href="@{/accountant/list-contract/{partnerId}(partnerId=${contract.partnerId})}">Quay lại</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

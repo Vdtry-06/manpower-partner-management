@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách hợp đồng</title>
+    <link rel="stylesheet" th:href="@{/accountant/list-contract.css}">
+</head>
+
+<nav class="navbar">
+    <div class="navbar-brand">
+        Hệ thống cung cấp nhân công
+    </div>
+    <div class="navbar-user">
+        <div class="user-info">
+            <div class="user-name" th:text="${username}"></div>
+            <div class="user-role">Nhân viên kế toán</div>
+        </div>
+        <a th:href="@{/auth/logout}" class="btn-logout">
+            Đăng xuất
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <h2 class="card-title">Danh sách hợp đồng</h2>
+
+        <div class="partner-info">
+            <h3 th:text="'Đối tác: ' + ${partner.namePartner}"></h3>
+            <p>
+                <strong>Thông tin liên hệ:</strong>
+                <span th:text="${partner.partnerRepresentative}"></span> –
+                <span th:text="${partner.phoneNumber}"></span>
+            </p>
+            <p>
+                <strong>Email:</strong>
+                <span th:text="${partner.email}"></span>
+            </p>
+        </div>
+
+        <h3 style="color: #333; margin-bottom: 15px;">Danh sách hợp đồng hiện tại</h3>
+
+        <!-- Nếu có hợp đồng -->
+        <div class="table-responsive" th:if="${contracts != null and #lists.size(contracts) > 0}">
+            <table>
+                <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Mã HĐ</th>
+                    <th>Tên HĐ</th>
+                    <th>Ngày BĐ</th>
+                    <th>Ngày KT</th>
+                    <th>Tổng GTHĐ</th>
+                    <th>Trạng thái hợp đồng</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="contract, stat : ${contracts}"
+                    th:onclick="'window.location.href=\'/accountant/detail-contract/' + ${contract.id} + '\';'">
+
+                    <td th:text="${stat.index + 1}"></td>
+                    <td th:text="'HĐ' + ${contract.id}"></td>
+                    <td><strong th:text="${contract.contractName}"></strong></td>
+
+                    <td th:text="${contract.startDate}"></td>
+                    <td th:text="${contract.endDate}"></td>
+
+                    <td th:text="${contract.totalContractValue} + ' VNĐ'"></td>
+
+                    <td>
+                        <span th:if="${contract.status == 'ACTIVE'}"
+                              class="status-badge status-active">Hoạt động</span>
+
+                        <span th:if="${contract.status != 'ACTIVE'}"
+                              class="status-badge"
+                              th:text="${contract.status}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Nếu không có hợp đồng -->
+        <div th:if="${contracts == null or #lists.isEmpty(contracts)}">
+            <div class="alert alert-warning">
+                Đối tác này chưa có hợp đồng nào đang hoạt động
+            </div>
+
+            <div class="no-data">
+                <p>Không có hợp đồng nào</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 25px;">
+            <a th:href="@{/accountant/search-partner}" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

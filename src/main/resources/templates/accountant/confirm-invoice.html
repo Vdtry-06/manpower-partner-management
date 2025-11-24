@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận hóa đơn</title>
+    <link rel="stylesheet" th:href="@{/accountant/confirm-invoice.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-brand">Hệ thống cung cấp nhân công</div>
+    <div class="navbar-user">
+        <div class="user-name" th:text="${username}"></div>
+        <a th:href="@{/auth/logout}">Đăng xuất</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <h2>Xác nhận hóa đơn</h2>
+
+        <div class="info-section">
+            <h3 th:text="'Hợp đồng: ' + ${preview.contractName}"></h3>
+            <p><strong>Đối tác:</strong> <span th:text="${preview.partnerName}"></span></p>
+            <p><strong>Người đại diện:</strong> <span th:text="${preview.partnerRepresentative}"></span></p>
+            <p><strong>Kế toán:</strong> <span th:text="${preview.accountantName}"></span></p>
+            <p><strong>Ngày lập hóa đơn:</strong> <span th:text="${preview.invoiceDate}"></span></p>
+        </div>
+
+        <h3>Danh sách ca làm việc</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Ngày làm</th>
+                    <th>Ca</th>
+                    <th>SL nhân công</th>
+                    <th>Đơn giá (VNĐ)</th>
+                    <th>Thành tiền (VNĐ)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="shift, stat : ${preview.shifts}">
+                    <td th:text="${stat.index + 1}"></td>
+                    <td th:text="${shift.workDate}"></td>
+                    <td th:text="${shift.startTime} + ' - ' + ' ' + ${shift.endTime}"></td>
+                    <td th:text="${shift.workerCount}"></td>
+                    <td th:text="${shift.shiftUnitPrice}"></td>
+                    <td th:text="${shift.totalValue}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="payment-info">
+            <h3>Thông tin thanh toán</h3>
+            <p>Tổng tiền: [[${preview.totalAmount}]]</p>
+            <p>Thanh toán: [[${preview.paymentAmount}]]</p>
+            <p>Còn lại: <strong>[[${preview.remainingAmount}]]</strong></p>
+            <p><strong>Phương thức thanh toán:</strong>
+                <span th:text="${preview.paymentMethod.name == 'CASH' ? 'Tiền mặt' : 'Chuyển khoản'}"></span>
+            </p>
+            <form th:action="@{/accountant/save-invoice}" method="post"  id="paymentForm">
+                <button type="submit" class="btn btn-primary">Hoàn tất hóa đơn</button>
+            </form>
+            <a th:href="@{/accountant/detail-contract/{id}(id=${preview.contractId})}" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

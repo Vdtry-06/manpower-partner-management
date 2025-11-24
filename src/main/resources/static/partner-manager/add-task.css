@@ -62,15 +62,16 @@ body {
 
 .page-header {
     background: white;
-    border-radius: 8px;
     padding: 20px;
+    border-radius: 8px;
     margin-bottom: 20px;
     border: 1px solid #ddd;
 }
 
 .page-header h1 {
-    font-size: 22px;
-    margin-bottom: 15px;
+    color: #333;
+    font-size: 28px;
+    margin-bottom:8px;
 }
 
 .page-header p {
@@ -80,16 +81,15 @@ body {
 
 .form-card {
     background: white;
-    border-radius: 8px;
-    padding: 20px;
-    border: 1px solid #ddd;
+        padding: 30px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
 }
 
 .alert {
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    font-size: 13px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }
 
 .alert-danger {
@@ -98,18 +98,13 @@ body {
     border: 1px solid #f5c6cb;
 }
 
-.error {
-    color: #E62727;
-    font-size: 13px;
-}
-
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 25px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     color: #333;
     font-weight: 600;
     font-size: 14px;
@@ -123,61 +118,73 @@ body {
 .form-group input,
 .form-group textarea {
     width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
     font-size: 14px;
+    transition: all 0.3s ease;
+    font-family: inherit;
 }
 
-textarea {
-    min-height: 80px;
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group .error {
+    color: #dc3545;
+    font-size: 13px;
+    margin-top: 5px;
+    display: block;
+}
+
+.form-group input.error-input,
+.form-group textarea.error-input {
+    border-color: #dc3545;
 }
 
 .form-actions {
     display: flex;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid #f0f0f0;
 }
 
 .btn {
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
+    padding: 12px 30px;
     border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
     text-decoration: none;
     display: inline-block;
     text-align: center;
+    transition: all 0.3s;
 }
 
 .btn-primary {
     background: #667eea;
     color: white;
-    flex: 1;
 }
 
 .btn-primary:hover {
-    background: #4a67e6;
+    background: #5568d3;
 }
 
 .btn-secondary {
-    background: #ddd;
-    color: black;
+    background: #6c757d;
+    color: white;
 }
 
 .btn-secondary:hover {
-    background: #CBCBCB;
-}
-
-@media (max-width: 768px) {
-    .form-row {
-        grid-template-columns: 1fr;
-    }
+    background: #5a6268;
 }
