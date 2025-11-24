@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Table(name = "tblContract", schema = "public")
 @Builder
@@ -23,13 +23,13 @@ public class Contract implements Serializable {
     private String contractName;
 
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "total_contract_value", length = 20)
-    private Integer totalContractValue;
+    private Long totalContractValue;
 
     @Column(name = "contract_status")
     @Enumerated(EnumType.STRING)
