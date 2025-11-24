@@ -19,14 +19,14 @@ public class AuthService {
         if (employee == null || !employee.getUsername().equals(request.getUsername())) {
             return LoginResponse.builder()
                     .success(false)
-                    .message("Username not found!")
+                    .message("Không tìm thấy tên đăng nhập!")
                     .build();
         }
 
         if (!employee.getPassword().equals(request.getPassword())) {
             return LoginResponse.builder()
                     .success(false)
-                    .message("Password was wrong!")
+                    .message("Nhập sai mật khẩu!")
                     .build();
         }
 
@@ -41,7 +41,7 @@ public class AuthService {
                 .username(employee.getUsername())
                 .fullname(employee.getFullname())
                 .position(employee.getPosition())
-                .message("Login successful!")
+                .message("Đăng nhập thành công!")
                 .build();
     }
 
