@@ -19,11 +19,17 @@ public class ShiftTaskContract implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "worker_count")
+    private Integer workerCount;
+
+    @Column(name = "shift_unit_price")
+    private Long shiftUnitPrice;
+
     @ManyToOne
     @JoinColumn(name = "task_contract_id")
     private TaskContract taskContractId;
 
     @ManyToOne
-    @JoinColumn(name = "shift_id")
+    @JoinColumn(name = "shift_id", nullable = true)
     private Shift shiftId;
 }

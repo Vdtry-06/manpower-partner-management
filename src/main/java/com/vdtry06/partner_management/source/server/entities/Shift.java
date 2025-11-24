@@ -1,5 +1,6 @@
 package com.vdtry06.partner_management.source.server.entities;
 
+import com.vdtry06.partner_management.lib.enumerated.ShiftType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Table(name = "tblShift", schema = "public")
 @Builder
@@ -25,25 +25,14 @@ public class Shift implements Serializable {
     @Column(name = "work_date")
     private LocalDate workDate;
 
-    @Column(name = "start_time")
-    private LocalTime startTime;
-
-    @Column(name = "end_time")
-    private LocalTime endTime;
-
-    @Column(name = "worker_count")
-    private Integer workerCount;
-
-    @Column(name = "shift_unit_price")
-    private Long shiftUnitPrice;
-
-    @Column(name = "remaining_amount")
-    private Integer remainingAmount;
+    @Column(name = "shift_type")
+    @Enumerated(EnumType.STRING)
+    private ShiftType shiftType;
 
     @Column(name = "description", length = 255, nullable = true)
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "invoice_id")
-    private Invoice invoiceId;
+    @JoinColumn(name = "invoice_id", nullable = true)
+    private Invoice invoice;
 }
