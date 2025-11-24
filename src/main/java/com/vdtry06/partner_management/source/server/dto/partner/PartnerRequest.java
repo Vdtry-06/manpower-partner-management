@@ -1,6 +1,7 @@
 package com.vdtry06.partner_management.source.server.dto.partner;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ public class PartnerRequest {
     private String address;
     private String taxCode;
 
+    @FutureOrPresent(message = "Ngày hợp tác phải từ hôm nay trở đi")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate connperationDate;
     private String description;

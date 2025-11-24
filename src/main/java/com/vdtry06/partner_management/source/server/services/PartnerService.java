@@ -4,12 +4,14 @@ import com.vdtry06.partner_management.source.server.dto.partner.PartnerRequest;
 import com.vdtry06.partner_management.source.server.dto.partner.PartnerResponse;
 import com.vdtry06.partner_management.source.server.entities.Partner;
 import com.vdtry06.partner_management.source.server.entities.PartnerManager;
+import com.vdtry06.partner_management.source.server.repositories.AccountantRepository;
 import com.vdtry06.partner_management.source.server.repositories.PartnerManagerRepository;
 import com.vdtry06.partner_management.source.server.repositories.PartnerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,15 +20,22 @@ import java.util.stream.Collectors;
 public class PartnerService {
     private final PartnerRepository partnerRepository;
     private final PartnerManagerRepository partnerManagerRepository;
+    private final AccountantRepository accountantRepository;
 
-    public List<PartnerResponse> searchPartnersByNamePartner(String namePartner, Integer managerId) {
-        if (namePartner == null || namePartner.trim().isEmpty()) {
-            return getPartnersByManagerIdResponse(managerId);
+    public List<PartnerResponse> searchPartnersByNamePartner(String namePartner, Integer employeeId) {
+        boolean isPartnerManager = partnerManagerRepository.existsById(employeeId);
+        boolean isAccountant = accountantRepository.existsById(employeeId);
+        if (isPartnerManager) {
+            if (namePartner == null || namePartner.trim().isEmpty()) return getPartnersByManagerIdResponse(employeeId);
+            return partnerRepository.searchByNamePartnerAndManagerId(namePartner.trim(), employeeId).stream()
+                    .map(partner -> toPartnerResponse(partner))
+                    .collect(Collectors.toList());
+        } else if (isAccountant) {
+            return partnerRepository.searchByNamePartnerAndAccountantId(namePartner.trim()).stream()
+                    .map(partner -> toPartnerResponse(partner))
+                    .collect(Collectors.toList());
         }
-
-        return partnerRepository.searchByNamePartnerAndManagerId(namePartner.trim(), managerId).stream()
-                .map(partner -> toPartnerResponse(partner))
-                .collect(Collectors.toList());
+        return Collections.emptyList();
     }
 
     public List<PartnerResponse> getPartnersByManagerIdResponse(Integer managerId) {
@@ -40,11 +49,27 @@ public class PartnerService {
                 .orElseThrow(() -> new RuntimeException("Partner Manager not found"));
 
         Partner partner = toPartner(request);
+        if (partnerRepository.existsByNamePartner(partner.getNamePartner()))
+            throw new RuntimeException("Tên đối tác đã có trong hệ thống");
+
+        if (partnerRepository.existsByTaxCode(partner.getTaxCode()))
+            throw new RuntimeException("Mã số thuế đã có trong hệ thống");
+
         partner.setPartnerManagerId(partnerManager);
         partner = partnerRepository.save(partner);
         return PartnerResponse.builder()
                 .id(partner.getId())
                 .build();
+    }
+
+    public PartnerResponse getPartnerResponseById(Integer id) {
+        Partner partner = getPartnerById(id);
+        return toPartnerResponse(partner);
+    }
+
+    public Partner getPartnerById(Integer id) {
+        return partnerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy id đối tác"));
     }
 
     private PartnerResponse toPartnerResponse(Partner partner) {
