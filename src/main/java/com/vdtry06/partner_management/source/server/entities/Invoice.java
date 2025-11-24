@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Date;
+import java.util.List;
 
 @Table(name = "tblInvoice", schema = "public")
 @Builder
@@ -26,10 +25,13 @@ public class Invoice implements Serializable {
     private Integer id;
 
     @Column(name = "invoice_date")
-    private LocalTime invoiceDate;
+    private LocalDateTime invoiceDate;
 
     @Column(name = "payment_amount")
-    private Integer paymentAmount;
+    private Long paymentAmount;
+
+    @Column(name = "remaining_amount")
+    private Long remainingAmount;
 
     @Column(name = "payment_method")
     @Enumerated(EnumType.STRING)
@@ -42,4 +44,7 @@ public class Invoice implements Serializable {
     @ManyToOne
     @JoinColumn(name = "accountant_id")
     private Accountant accountantId;
+
+    @OneToMany(mappedBy = "invoice")
+    private List<Shift> shifts;
 }
