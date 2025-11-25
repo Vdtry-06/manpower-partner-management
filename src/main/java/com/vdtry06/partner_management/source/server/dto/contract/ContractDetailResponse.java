@@ -19,14 +19,12 @@ public class ContractDetailResponse {
     private String startDate;
     private String endDate;
 
-    // Partner info
     private Integer partnerId;
     private String partnerName;
     private String partnerRepresentative;
     private String partnerPhone;
     private String partnerEmail;
 
-    // partner manager info
     private String managerName;
     private String managerPosition;
 

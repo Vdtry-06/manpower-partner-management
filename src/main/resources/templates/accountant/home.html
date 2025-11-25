@@ -33,8 +33,9 @@
 
     <div class="welcome-card">
         <h1 th:text="'Xin chào, ' + ${fullname} + '!'"></h1>
-        <p>Chào mừng bạn đến với hệ thống kế toán. Bạn có thể quản lý hóa đơn, thanh toán và theo dõi các ca làm việc từ đây.</p>
+        <p>Chào mừng bạn đến với hệ thống kế toán. Bạn có thể nhận thanh toán từ đối tác</p>
     </div>
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
 
     <div class="dashboard-grid">
         <a th:href="@{/accountant/search-partner}" class="dashboard-card">

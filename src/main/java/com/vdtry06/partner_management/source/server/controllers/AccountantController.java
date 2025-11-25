@@ -39,7 +39,7 @@ public class AccountantController {
         model.addAttribute("fullname", session.getAttribute("fullname"));
         model.addAttribute("username", session.getAttribute("username"));
 
-        return "accountant/home";
+        return appUrls.getHome().get("accountant");
     }
 
     @GetMapping("/search-partner")
@@ -113,10 +113,10 @@ public class AccountantController {
             session.setAttribute("invoicePreview", invoiceConfirmResponse);
             session.setAttribute("selectedShiftIds", shiftIds);
 
-            return "redirect:/accountant/confirm-invoice";
+            return "redirect:" + appUrls.getConfirm().get("confirm-invoice");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/accountant/detail-contract/" + contractId;
+            return "redirect:" + appUrls.getSelect().get("select-contract") + contractId;
         }
     }
 
@@ -128,13 +128,13 @@ public class AccountantController {
         InvoiceConfirmResponse response = (InvoiceConfirmResponse) session.getAttribute("invoicePreview");
 
         if (response == null) {
-            return "redirect:/accountant/home";
+            return "redirect:" + appUrls.getHome().get("accountant");
         }
 
         model.addAttribute("preview", response);
         model.addAttribute("username", session.getAttribute("username"));
 
-        return "accountant/confirm-invoice";
+        return appUrls.getConfirm().get("confirm-invoice");
     }
 
     @PostMapping("/save-invoice")
@@ -147,22 +147,22 @@ public class AccountantController {
 
         if (response == null || shiftIds == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "Không có dữ liệu hóa đơn.");
-            return "redirect:/accountant/home";
+            return "redirect:" + appUrls.getHome().get("accountant");
         }
 
         try {
             Integer accountantId = (Integer) session.getAttribute("employeeId");
 
-            InvoiceResponse invoice = invoiceService.saveInvoice(response, shiftIds, accountantId);
+            invoiceService.saveInvoice(response, shiftIds, accountantId);
 
             session.removeAttribute("invoicePreview");
             session.removeAttribute("selectedShiftIds");
 
             redirectAttributes.addFlashAttribute("successMessage", "Lưu hóa đơn thành công.");
-            return "redirect:/accountant/home";
+            return "redirect:" + appUrls.getHome().get("accountant");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/accountant/confirm-invoice";
+            return "redirect:" + appUrls.getConfirm().get("confirm-invoice");
         }
     }
 }

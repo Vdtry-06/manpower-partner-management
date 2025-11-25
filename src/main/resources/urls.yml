@@ -30,3 +30,4 @@ app:
     confirm:
       confirm-contract: /partner-manager/confirm-contract
       contract: /partner-manager/contract/confirm
+      confirm-invoice: /accountant/confirm-invoice

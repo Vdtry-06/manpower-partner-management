@@ -32,6 +32,10 @@ public class ContractService {
     public List<ContractResponse> getAllContractsByPartnerId(Integer partnerId) {
         return contractRepository.findByPartnerId_Id(partnerId).stream()
                 .map(contract -> toContractResponse(contract))
+                .filter(stc ->
+                        !stc.getStatus().equals(ContractStatus.CANCELLED.name()) &&
+                                !stc.getStatus().equals(ContractStatus.COMPLETED.name()) &&
+                                !stc.getStatus().equals(ContractStatus.DRAFT.name()))
                 .collect(Collectors.toList());
     }
 
